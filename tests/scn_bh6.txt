@@ -1,0 +1,88 @@
+STATE
+run 30
+hold L 60
+run 10
+hold D 70
+run 10
+hold R 9
+run 10
+hold D 20
+run 10
+hold D 9
+run 10
+tap L
+run 20
+tap A
+run 60
+tap A
+run 40
+tap A
+run 40
+tap A
+run 40
+tap A
+run 40
+tap A
+run 40
+tap A
+run 120
+tap A
+run 60
+tap A
+run 60
+hold U 9
+run 10
+LOG
+hold R 9
+run 10
+LOG
+hold R 9
+run 10
+LOG
+hold R 9
+run 30
+LOG
+run 60
+SHOT a
+tap A
+run 60
+tap A
+run 300
+SHOT b
+tap A
+run 40
+SHOT x0
+tap A
+run 40
+SHOT x1
+tap A
+run 40
+SHOT x2
+tap A
+run 40
+SHOT x3
+tap A
+run 40
+SHOT x4
+tap A
+run 40
+SHOT x5
+tap A
+run 40
+SHOT x6
+tap A
+run 40
+SHOT x7
+tap A
+run 40
+SHOT x8
+tap A
+run 40
+SHOT x9
+tap A
+run 40
+SHOT x10
+tap A
+run 40
+SHOT x11
+SAVE bhbattle

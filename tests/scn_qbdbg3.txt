@@ -1,0 +1,99 @@
+STATE
+BAG balls 0 4 5
+BAG balls 1 3 2
+SEED 0BADC0DE
+hold L 64
+run 10
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+run 300
+tap A 2
+run 120
+peek 0203FF2C 8
+peek 060122A0 64
+peek 050002C0 32
+SHOT a
+hold r 6
+run 200
+SHOT r
+tap A 3
+run 100
+SHOT s

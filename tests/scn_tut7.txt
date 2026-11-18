@@ -1,0 +1,90 @@
+STATE
+FLAG 4A7
+FLAG 2C6
+MONEY 20000
+MON 0 63 100 0 0 0 20
+MON 1 96 1 0 0 0 20
+COUNT 2
+FLAG 828
+SB1 1C 03 01 FF 00 1A 00 1B 00
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap D
+tap D
+tap A
+run 60
+tap A
+run 60
+tap A
+run 900
+hold L 32
+run 30
+LOG
+hold U 24
+run 20
+LOG
+hold U 24
+run 20
+LOG
+hold L 80
+run 20
+LOG
+hold U 24
+run 20
+LOG
+hold U 24
+run 20
+LOG
+hold L 120
+run 20
+LOG
+poke 02036D7C 0F
+poke 02036D7D 00
+poke 02036D7E 20
+poke 02036D7F 00
+poke 02036D80 0F
+poke 02036D81 00
+poke 02036D82 20
+poke 02036D83 00
+run 5
+LOG
+tap D
+run 10
+SHOT a
+tap A
+run 90
+SHOT b
+tap A
+run 90
+SHOT c
+tap A
+run 90
+SHOT d
+tap A
+run 90
+SHOT e
+tap A
+run 120
+SHOT f
+tap A
+run 120
+SHOT g
+tap D
+run 10
+tap A
+run 200
+SHOT h
+tap A
+run 120
+SHOT i
+tap A
+run 120
+SHOT j
+tap A
+run 120
+SHOT k

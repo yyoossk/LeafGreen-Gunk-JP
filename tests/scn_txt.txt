@@ -1,0 +1,19 @@
+STATE
+tap S
+run 20
+tap D 3
+tap A
+run 60
+tap R
+run 10
+tap B
+run 60
+tap B
+run 30
+hold U 2
+run 5
+tap A
+run 2
+SHOT a
+run 20
+SHOT b

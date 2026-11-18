@@ -1,0 +1,28 @@
+STATE
+MON 0 92 212 281 274 33 20
+COUNT 1
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap A
+run 90
+tap R
+run 30
+tap R
+run 30
+tap A
+run 30
+SHOT a
+tap D
+run 10
+SHOT b
+tap D
+run 10
+SHOT c
+tap D
+run 10
+SHOT d

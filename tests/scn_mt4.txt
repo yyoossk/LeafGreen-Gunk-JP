@@ -1,0 +1,56 @@
+STATE
+FLAG 820
+FLAG 821
+FLAG 822
+FLAG 823
+FLAG 824
+FLAG 825
+FLAG 826
+FLAG 827
+poke 02023BC4 01
+poke 02023BC5 00
+poke 02023B90 00
+poke 02023B91 00
+poke 02023B92 00
+poke 02023B93 00
+tap A
+run 40
+tap A
+run 40
+tap A
+run 300
+SHOT a
+tap A
+run 200
+SHOT b
+tap A
+run 200
+SHOT c
+tap A
+run 200
+SHOT d
+tap A
+run 200
+SHOT e
+tap A
+run 200
+SHOT f
+tap A
+run 200
+SHOT g
+tap A
+run 200
+SHOT h
+tap A
+run 200
+SHOT i
+tap A
+run 200
+SHOT j
+tap A
+run 200
+SHOT k
+tap A
+run 200
+SHOT l
+SAVE mt_won

@@ -1,0 +1,17 @@
+STATE
+SEED 1234
+hold U 16
+run 2
+hold U 16
+run 2
+hold U 16
+run 2
+SHOT U
+hold L 16
+run 2
+hold L 16
+run 2
+SHOT L
+hold D 16
+run 2
+SHOT D

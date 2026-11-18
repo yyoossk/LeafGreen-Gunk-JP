@@ -1,0 +1,11 @@
+STATE
+FLAG 82F
+SEED 11112222
+hold R 32
+LOG
+hold L 32
+LOG
+hold RB 32
+LOG
+hold LB 32
+LOG

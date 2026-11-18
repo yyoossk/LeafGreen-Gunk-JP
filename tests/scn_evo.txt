@@ -1,0 +1,31 @@
+STATE
+MON 0 64 93 50 0 0 35
+COUNT 1
+FLAG 828
+BAG items 0 68 5
+BAG items 1 199 1
+run 5
+tap S
+run 20
+tap D
+tap A
+run 90
+SHOT a
+tap A
+run 30
+SHOT b
+tap A
+run 60
+SHOT c
+tap A
+run 60
+SHOT d
+tap A
+run 200
+SHOT e
+tap A 3
+run 400
+SHOT f
+tap A 6
+run 200
+SHOT g

@@ -1,0 +1,23 @@
+STATE
+MON 0 95 33 0 0 0 30
+MON 1 143 33 0 0 0 30
+MON 2 131 57 0 0 0 30
+MON 3 130 33 0 0 0 30
+COUNT 4
+SEED 13572468
+run 5
+hold R 80
+hold U 80
+hold L 20
+run 200
+hold L 50
+run 20
+hold L 32
+hold D 120
+run 200
+hold R 32
+hold U 200
+hold R 32
+hold U 80
+run 30
+SHOT a

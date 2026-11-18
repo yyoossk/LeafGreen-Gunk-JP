@@ -1,0 +1,25 @@
+STATE
+FLAG 828
+MON 0 4 10 45 0 0 10
+COUNT 1
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap A
+run 90
+tap R
+run 40
+SHOT a
+tap A
+run 30
+SHOT b
+tap A
+run 30
+SHOT c
+tap A
+run 30
+SHOT d

@@ -1,0 +1,19 @@
+STATE
+MON 0 63 94 100 0 0 60
+MON 1 4 10 45 52 0 20
+COUNT 2
+FLAG 828
+
+SB1 1C 03 01 FF 00 08 00 20 00
+run 5
+hold R 80
+hold U 80
+hold L 20
+run 200
+hold L 50
+run 20
+hold L 32
+hold D 120
+run 200
+SHOT a
+SAVE pallet_pre

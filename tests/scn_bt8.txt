@@ -1,0 +1,47 @@
+STATE
+pokeptr 03004FAC 57A 1C
+pokeptr 03004FAC 57B 00
+hold D 20
+run 120
+hold U 20
+run 120
+SHOT a
+hold U 32
+run 20
+tap R
+run 10
+tap A
+run 60
+SHOT b
+tap A
+run 60
+SHOT c
+tap A
+run 60
+SHOT d
+tap A
+run 200
+SHOT e
+tap A
+run 60
+SHOT f
+tap A
+run 60
+SHOT g
+tap A
+run 60
+tap A
+run 60
+tap A
+run 60
+SHOT h
+hold L 16
+run 20
+tap U
+tap A
+run 60
+SHOT i
+tap A
+run 60
+SHOT j
+SAVE bt_scott

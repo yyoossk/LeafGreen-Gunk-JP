@@ -1,0 +1,17 @@
+STATE
+BAG items 0 86 3
+VAR 4020 1
+VAR 4029 86
+run 5
+hold U 16
+run 30
+SHOT a
+tap A
+run 40
+SHOT b
+tap A
+run 60
+SHOT c
+tap A
+run 60
+SHOT d

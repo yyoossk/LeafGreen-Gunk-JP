@@ -1,0 +1,29 @@
+STATE
+FLAG 828
+BAG key 0 52 1
+BAG key 1 53 1
+run 5
+tap S
+run 20
+tap D
+tap A
+run 90
+tap R
+run 30
+SHOT a
+tap A
+run 30
+SHOT b
+tap A
+run 60
+SHOT c
+tap A
+run 40
+tap D
+run 10
+SHOT d
+tap A
+run 30
+tap A
+run 60
+SHOT e

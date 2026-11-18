@@ -1,0 +1,44 @@
+STATE
+VAR 4076 5
+VAR 407E 3
+SB1 1C 03 05 FF 00 18 00 20 00
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap D
+run 5
+tap D
+run 5
+tap A
+run 60
+tap A
+run 400
+SHOT a
+tap D
+run 10
+tap A
+run 60
+SHOT b
+tap A
+run 30
+SHOT c
+tap D
+run 10
+SHOT d
+tap A
+run 60
+SHOT e
+tap A
+run 60
+tap A
+run 400
+SHOT f
+run 600
+SHOT g
+run 600
+SHOT h
+SAVE bt_arrive

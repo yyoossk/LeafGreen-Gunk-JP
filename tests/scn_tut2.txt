@@ -1,0 +1,37 @@
+STATE
+run 30
+hold U 64
+hold R 64
+hold U 48
+run 10
+tap A
+run 90
+tap A
+run 60
+SHOT a
+tap D
+run 5
+tap D
+run 5
+tap A
+run 90
+SHOT b
+tap A
+run 60
+SHOT c
+tap A
+run 90
+tap D
+run 10
+tap A
+run 120
+SHOT d
+tap A
+run 120
+SHOT e
+tap A
+run 60
+SHOT f
+tap A
+run 60
+SHOT g

@@ -1,0 +1,23 @@
+STATE
+hold R 16
+run 10
+tap D
+run 10
+tap A
+run 40
+SHOT a
+tap A
+run 40
+SHOT b
+tap A
+run 60
+SHOT c
+tap A
+run 60
+SHOT d
+tap A
+run 60
+SHOT e
+tap A
+run 60
+SHOT f

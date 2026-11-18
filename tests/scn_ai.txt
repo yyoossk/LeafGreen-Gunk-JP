@@ -1,0 +1,31 @@
+STATE
+FLAG 820
+FLAG 821
+FLAG 822
+FLAG 823
+FLAG 824
+FLAG 825
+FLAG 826
+FLAG 827
+poke 02023B50 0C
+poke 02023B51 01
+run 5
+tap A
+run 30
+tap A
+run 120
+SHOT a
+run 120
+SHOT b
+run 120
+SHOT c
+run 120
+SHOT d
+tap A
+run 400
+SHOT e
+tap A
+run 30
+tap A
+run 600
+SHOT f

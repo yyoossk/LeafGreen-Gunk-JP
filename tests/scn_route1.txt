@@ -1,0 +1,30 @@
+STATE
+MON 0 4 10 45 0 0 10
+MON 1 7 33 0 0 0 10
+COUNT 2
+VAR 4050 3
+FLAG 828
+FLAG 258
+SEED 13572468
+run 5
+hold R 80
+hold U 80
+hold L 20
+run 200
+hold L 50
+run 20
+hold L 32
+hold D 120
+run 200
+hold R 32
+hold U 200
+hold R 32
+hold U 120
+hold R 16
+hold U 200
+hold R 16
+hold U 200
+run 60
+LOG
+SHOT a
+SAVE route1

@@ -1,0 +1,21 @@
+STATE
+run 60
+SHOT a
+hold U 64
+run 10
+SHOT b
+hold U 96
+run 10
+SHOT c
+hold U 96
+run 10
+SHOT d
+hold L 80
+run 10
+SHOT e
+hold U 64
+run 100
+SHOT f
+run 100
+SHOT g
+SAVE bt_lobby

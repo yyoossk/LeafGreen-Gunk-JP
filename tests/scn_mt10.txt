@@ -1,0 +1,19 @@
+STATE
+run 300
+tap A
+run 100
+tap A
+run 60
+tap A
+run 30
+tap A
+run 600
+SHOT a
+tap R
+run 10
+tap A
+run 60
+SHOT b
+tap A
+run 60
+SHOT c

@@ -1,0 +1,37 @@
+STATE
+MON 0 63 100 0 0 0 20
+COUNT 1
+FLAG 82C
+SB1 1C 0A 01 FF 00 02 00 06 00
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap D
+run 5
+tap D
+run 5
+tap A
+run 60
+tap A
+run 400
+SHOT a
+tap L
+run 20
+tap A
+run 60
+SHOT b
+tap A
+run 200
+SHOT c
+tap U
+run 10
+SHOT d
+tap B
+run 100
+tap B
+run 100
+SHOT e

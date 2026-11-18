@@ -1,0 +1,36 @@
+STATE
+FLAG 4A7
+MON 0 150 57 89 0 0 100
+MON 1 63 100 0 0 0 20
+COUNT 2
+FLAG 828
+FLAG 820
+FLAG 821
+FLAG 822
+FLAG 823
+FLAG 824
+FLAG 825
+FLAG 826
+FLAG 827
+orptr 03004FAC 15 06
+VAR 408C 0x0302
+SB1 1C 1F 00 FF 00 04 00 06 00
+run 5
+tap S
+run 20
+tap A
+run 60
+tap D
+run 10
+tap A
+run 30
+tap D
+tap D
+tap A
+run 60
+tap A
+run 60
+tap A
+run 900
+SHOT a
+SAVE room1

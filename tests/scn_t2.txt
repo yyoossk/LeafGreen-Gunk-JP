@@ -1,0 +1,15 @@
+STATE
+LOG
+hold L 16
+run 4
+LOG
+hold L 16
+run 4
+LOG
+hold R 16
+run 4
+LOG
+hold U 16
+run 4
+LOG
+SHOT a

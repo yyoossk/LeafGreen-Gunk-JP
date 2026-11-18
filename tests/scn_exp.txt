@@ -1,0 +1,94 @@
+STATE
+FLAG 4A8
+BAG key 0 53 1
+SEED 0BADC0DE
+hold L 64
+run 10
+LOG
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+hold L 16
+hold R 16
+run 300
+run 1
+tap A 2
+run 90
+run 1
+tap A
+run 30
+tap A
+run 200
+tap A
+run 30
+tap A
+run 200
+tap A
+run 30
+tap A
+run 200
+tap A
+run 30
+tap A
+run 200
+tap A
+run 30
+tap A
+run 200
+tap A
+run 30
+tap A
+run 200
+run 1
+tap A
+run 90
+run 1
+tap A
+run 90
+run 1
+tap A
+run 90
+run 1
+tap A
+run 100
+SHOT g0
+tap A
+run 100
+SHOT g1
+tap A
+run 100
+SHOT g2
+tap A
+run 100
+SHOT g3
+tap A
+run 100
+SHOT g4
+tap A
+run 100
+SHOT g5

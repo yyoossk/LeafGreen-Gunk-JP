@@ -1,0 +1,20 @@
+STATE
+MON 0 63 100 0 0 0 20
+COUNT 1
+SB1 1C 03 08 FF 00 12 00 07 00
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap D
+run 5
+tap D
+run 5
+tap A
+run 60
+tap A
+run 500
+SHOT a

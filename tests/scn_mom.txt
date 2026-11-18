@@ -1,0 +1,36 @@
+STATE
+FLAG 829
+FLAG 828
+FLAG 258
+run 5
+hold R 80
+hold U 80
+hold L 20
+run 200
+hold D 32
+run 10
+hold L 16
+run 20
+LOG
+hold L 2
+tap A
+run 60
+SHOT a
+tap A 3
+run 60
+SHOT b
+tap A 2
+run 60
+SHOT c
+tap A 2
+run 100
+SHOT d
+tap A 2
+run 100
+SHOT e
+tap A 3
+run 100
+SHOT f
+tap A 3
+run 100
+SHOT g

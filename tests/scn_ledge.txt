@@ -1,0 +1,10 @@
+STATE
+SEED 0BADC0DE
+hold D 40
+run 30
+LOG
+SHOT a
+hold D 32
+run 30
+LOG
+SHOT b

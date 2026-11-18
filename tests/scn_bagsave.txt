@@ -1,0 +1,43 @@
+STATE
+BAG med 0 13 5
+BAG held 0 200 7
+run 5
+tap S
+run 30
+SHOT a
+tap D
+run 5
+tap D
+run 5
+SHOT b
+tap A
+run 120
+SHOT c
+tap A
+run 2500
+SHOT d
+reset
+run 900
+tap A 3
+run 200
+tap A
+run 120
+tap A
+run 400
+tap B
+run 300
+tap B
+run 300
+SHOT e
+tap S
+run 30
+tap A
+run 120
+tap R
+run 60
+SHOT f
+tap R
+run 40
+tap R
+run 60
+SHOT g

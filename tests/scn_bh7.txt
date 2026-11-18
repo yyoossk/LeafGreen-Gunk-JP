@@ -1,0 +1,53 @@
+STATE
+SB1 3A60 FC 00
+run 30
+hold U 10
+run 30
+LOG
+tap U
+run 10
+tap A
+run 60
+SHOT a
+tap A
+run 70
+SHOT s1
+tap A
+run 70
+SHOT s2
+tap A
+run 70
+SHOT s3
+tap A
+run 70
+SHOT s4
+tap A
+run 70
+SHOT s5
+tap A
+run 70
+SHOT s6
+tap A
+run 70
+SHOT s7
+tap A
+run 70
+SHOT s8
+tap A
+run 70
+SHOT s9
+tap A
+run 70
+SHOT s10
+tap A
+run 70
+SHOT s11
+tap A
+run 70
+SHOT s12
+tap A
+run 70
+SHOT s13
+tap A
+run 70
+SHOT s14

@@ -1,0 +1,17 @@
+STATE
+FLAG 4A7
+BAG key 0 360 1
+VAR 402A 360
+run 5
+tap r
+run 60
+LOG
+hold L 64
+run 20
+LOG
+tap B
+run 20
+hold R 64
+run 20
+LOG
+SHOT a

@@ -1,0 +1,35 @@
+STATE
+SEED 2468ACE0
+hold R 48
+run 20
+hold R 64
+run 30
+LOG
+hold D 2
+run 10
+tap A
+run 60
+SHOT a
+tap A
+run 60
+tap A
+run 60
+SHOT b
+tap A
+run 60
+tap A
+run 200
+LOG
+SHOT c
+hold D 48
+run 30
+LOG
+SHOT d
+hold U 32
+run 40
+LOG
+SHOT e
+hold U 32
+run 60
+LOG
+SHOT f

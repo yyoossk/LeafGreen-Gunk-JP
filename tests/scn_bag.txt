@@ -1,0 +1,36 @@
+STATE
+BAG items 0 22 3
+BAG med 0 13 5
+BAG med 1 23 2
+BAG held 0 200 1
+BAG balls 0 4 10
+run 5
+tap S
+run 20
+tap A
+run 120
+SHOT a
+tap R
+run 60
+SHOT b
+tap R
+run 60
+SHOT c
+tap R
+run 60
+SHOT d
+tap R
+run 60
+SHOT e
+tap R
+run 60
+tap L
+run 60
+tap L
+run 60
+tap L
+run 60
+SHOT f
+tap A
+run 30
+SHOT g

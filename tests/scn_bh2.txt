@@ -1,0 +1,21 @@
+STATE
+run 30
+hold L 20
+run 10
+hold U 20
+run 10
+hold U 20
+run 10
+hold U 20
+run 10
+hold U 20
+run 10
+LOG
+hold R 20
+run 10
+LOG
+hold U 40
+run 200
+SHOT a
+LOG
+SAVE room2

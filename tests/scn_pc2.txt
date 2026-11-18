@@ -1,0 +1,35 @@
+STATE
+MON 0 4 10 45 52 0 20
+MON 1 7 33 0 0 0 10
+COUNT 2
+FLAG 829
+run 5
+hold U 16
+hold L 80
+hold U 40
+hold L 32
+hold U 16
+tap A
+run 60
+tap A
+run 60
+tap A
+run 60
+SHOT m
+tap D
+run 5
+tap D
+run 5
+SHOT n
+tap A
+run 60
+SHOT o
+tap A
+run 60
+SHOT p
+tap A
+run 60
+SHOT q
+tap A
+run 90
+SHOT r

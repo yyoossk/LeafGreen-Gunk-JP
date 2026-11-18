@@ -1,0 +1,49 @@
+STATE
+VAR 408E 0xFFFF
+VAR 408F 0xFFFF
+VAR 4090 0xFFFF
+VAR 4091 0xFFFF
+VAR 4092 0xFFFF
+VAR 4093 0xFFFF
+VAR 4094 0xFFFF
+VAR 4095 0xFFFF
+VAR 4096 0xFFFF
+VAR 4097 0x00FF
+SB1 1C 0A 09 FF 00 05 00 0C 00
+run 5
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap D
+run 5
+tap D
+run 5
+tap A
+run 60
+tap A
+run 400
+SHOT a
+tap R
+run 10
+tap A
+run 60
+SHOT b
+tap A
+run 40
+SHOT c
+tap A
+run 40
+SHOT d
+hold D 300
+SHOT e
+hold U 40
+SHOT f
+tap A
+run 40
+SHOT g
+tap A
+run 40
+SHOT h

@@ -1,0 +1,36 @@
+STATE
+run 30
+hold L 60
+run 10
+hold D 70
+run 10
+hold R 9
+run 10
+hold D 20
+run 10
+hold D 9
+run 10
+LOG
+tap L
+run 20
+tap A
+run 60
+SHOT a
+tap A
+run 40
+tap A
+run 40
+tap A
+run 40
+tap A
+run 40
+tap A
+run 40
+SHOT b
+tap A
+run 120
+SHOT c
+tap A
+run 60
+SHOT d
+LOG

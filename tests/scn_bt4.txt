@@ -1,0 +1,36 @@
+STATE
+MON 0 6 53 0 0 0 50
+MON 1 9 57 0 0 0 50
+MON 2 3 76 0 0 0 50
+COUNT 3
+FLAG 820
+FLAG 821
+FLAG 822
+FLAG 823
+FLAG 824
+FLAG 825
+FLAG 826
+FLAG 827
+hold U 32
+run 20
+tap A
+run 40
+SHOT a
+tap A
+run 40
+tap A
+run 40
+SHOT b
+tap A
+run 40
+SHOT c
+tap A
+run 40
+SHOT d
+tap A
+run 40
+SHOT e
+tap A
+run 100
+SHOT f
+SAVE bt_party

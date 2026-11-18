@@ -1,0 +1,11 @@
+STATE
+LOG
+hold L 64
+run 10
+LOG
+hold L 16
+LOG
+hold R 16
+LOG
+hold L 16
+LOG

@@ -1,0 +1,185 @@
+diff --git a/include/pokemon.h b/include/pokemon.h
+index cb62d9083..3403dd653 100644
+--- a/include/pokemon.h
++++ b/include/pokemon.h
+@@ -103,7 +103,7 @@ union PokemonSubstruct
+ };
+ 
+ // Gunk's: the size of a boxed Pokémon in PC storage (see Gunk_PackBoxMon)
+-#define GUNK_PACKED_BOX_MON_SIZE 70
++#define GUNK_PACKED_BOX_MON_SIZE 69 // JP port: 69 (the language lives in 3 spare bits), so 16 boxes fit the vanilla struct size
+ 
+ struct BoxPokemon
+ {
+diff --git a/include/pokemon_storage_system.h b/include/pokemon_storage_system.h
+index 876546ae5..a4e89af51 100644
+--- a/include/pokemon_storage_system.h
++++ b/include/pokemon_storage_system.h
+@@ -52,9 +52,10 @@ struct PokemonStorage
+     /*0x0000*/ u8 currentBox;
+     /*0x0001*/ u8 gunkPadding[3]; // the vanilla struct's alignment padding: boxes stay at the same offset
+     /*0x0004*/ u8 boxes[TOTAL_BOXES_COUNT][IN_BOX_COUNT][GUNK_PACKED_BOX_MON_SIZE];
+-    /*0x8344*/ u8 boxNames[TOTAL_BOXES_COUNT][BOX_NAME_LENGTH + 1];
+-    /*0x83D4*/ u8 boxWallpapers[TOTAL_BOXES_COUNT];
+-    /*0x83E4*/ u32 gunkFormat;
++    /*0x8164*/ u8 boxNames[TOTAL_BOXES_COUNT][BOX_NAME_LENGTH + 1];
++    /*0x81F4*/ u8 boxWallpapers[TOTAL_BOXES_COUNT];
++    /*0x8204*/ u8 gunkPadding2[0x83CC - 0x8204]; // JP port: the struct keeps the vanilla size (0x83D0)
++    /*0x83CC*/ u32 gunkFormat; // vanilla: wallpapers 10-13 (0-15 each), never this value
+ };
+ 
+ u8 *GetBoxNamePtr(u8 boxNumber);
+diff --git a/src/field_control_avatar.c b/src/field_control_avatar.c
+index 906d4a0e2..33f915fa7 100644
+--- a/src/field_control_avatar.c
++++ b/src/field_control_avatar.c
+@@ -1,4 +1,6 @@
+ #include "global.h"
++void UpdateBattleHouseStepCounter(void);
++#include "constants/region_map_sections.h"
+ #include "gunk_follower.h"
+ #include "gflib.h"
+ #include "bike.h"
+@@ -222,6 +224,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+         RunMassageCooldownStepCounter();
+         IncrementResortGorgeousStepCounter();
+         IncrementBirthIslandRockStepCount();
++        UpdateBattleHouseStepCounter(); // JP port (FRLG+): Gym Leaders visiting the Seven Island house
+         if (TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
+         {
+             gFieldInputRecord.tookStep = TRUE;
+@@ -298,6 +301,16 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+     }
+     if (input->pressedRButton && Gunk_UseSecondRegisteredItemOnField() == TRUE)
+         return TRUE;
++    // JP port (FRLG+): B on the bike switches between the normal gear and a Mach Bike gear (not on Cycling Road)
++    if (input->pressedBButton && (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
++     && gMapHeader.regionMapSectionId != MAPSEC_ROUTE_17)
++    {
++        if (FlagGet(0x0E3))
++            FlagClear(0x0E3);
++        else
++            FlagSet(0x0E3);
++        PlaySE(SE_BIKE_BELL);
++    }
+ 
+     return FALSE;
+ }
+diff --git a/src/gunk_quick_ball.c b/src/gunk_quick_ball.c
+index f91c4748e..e901b63c7 100644
+--- a/src/gunk_quick_ball.c
++++ b/src/gunk_quick_ball.c
+@@ -37,7 +37,7 @@
+ #define TAG_QUICK_BALL_ICON 0x6A00
+ #define BALLS_POCKET (POCKET_POKE_BALLS - 1)
+ #define WIDGET_X 16  // the icon's centre: screen tiles 0-3, rows 13-14
+-#define WIDGET_Y 112
++#define WIDGET_Y 104 // JP port: 112 is under a window the JP battle screen keeps without OBJs; 104 shows
+ 
+ // BG0, two rows above the action prompt. While the action menu shows, BG0 is scrolled to rows 20-39, so rows 33-34
+ // are the screen's 13-14; every other page of BG0 (messages, moves) leaves them off screen. Tiles 0x2D0-0x2FF are
+diff --git a/src/pokemon.c b/src/pokemon.c
+index f12728568..87bb823b3 100644
+--- a/src/pokemon.c
++++ b/src/pokemon.c
+@@ -6491,20 +6491,23 @@ void Gunk_PackBoxMon(const struct BoxPokemon *src, u8 *dst)
+     DecryptBoxMon(&mon);
+     s0 = &GetSubstruct(&mon, mon.personality, 0)->type0;
+     s1 = &GetSubstruct(&mon, mon.personality, 1)->type1;
+-    memcpy(dst, &mon, GUNK_PACK_HEADER_SIZE);
+-    memcpy(dst + 28, &s0->experience, 4);
+-    dst[32] = s0->ppBonuses;
+-    dst[33] = s0->friendship;
+-    memcpy(dst + 34, s1->pp, MAX_MON_MOVES);
+-    memcpy(dst + 38, GetSubstruct(&mon, mon.personality, 2), NUM_SUBSTRUCT_BYTES);
+-    memcpy(dst + 50, GetSubstruct(&mon, mon.personality, 3), NUM_SUBSTRUCT_BYTES);
++    // JP port: bytes 0-17 and 19-27 of the header; the language byte (18) goes into hi bits 29-31
++    memcpy(dst, &mon, 18);
++    memcpy(dst + 18, (u8 *)&mon + 19, GUNK_PACK_HEADER_SIZE - 19);
++    memcpy(dst + 27, &s0->experience, 4);
++    dst[31] = s0->ppBonuses;
++    dst[32] = s0->friendship;
++    memcpy(dst + 33, s1->pp, MAX_MON_MOVES);
++    memcpy(dst + 37, GetSubstruct(&mon, mon.personality, 2), NUM_SUBSTRUCT_BYTES);
++    memcpy(dst + 49, GetSubstruct(&mon, mon.personality, 3), NUM_SUBSTRUCT_BYTES);
+     lo = (s0->species & 0x3FF) | ((s0->heldItem & 0x3FF) << 10) | ((s1->moves[0] & 0x3FF) << 20) | ((s1->moves[1] & 3) << 30);
+     hi = ((s1->moves[1] >> 2) & 0xFF) | ((s1->moves[2] & 0x3FF) << 8) | ((s1->moves[3] & 0x3FF) << 18);
++    hi |= (u32)(mon.language & 7) << 29;
+     // a Bad Egg (or any Pokémon whose checksum fails) must stay one
+     if (CalculateBoxMonChecksum(&mon) != mon.checksum)
+         hi |= GUNK_PACK_BAD_CHECKSUM;
+-    memcpy(dst + 62, &lo, 4);
+-    memcpy(dst + 66, &hi, 4);
++    memcpy(dst + 61, &lo, 4);
++    memcpy(dst + 65, &hi, 4);
+ }
+ 
+ void Gunk_UnpackBoxMon(const u8 *src, struct BoxPokemon *dst)
+@@ -6514,23 +6517,25 @@ void Gunk_UnpackBoxMon(const u8 *src, struct BoxPokemon *dst)
+     u32 lo, hi;
+ 
+     memset(dst, 0, sizeof(*dst));
+-    memcpy(dst, src, GUNK_PACK_HEADER_SIZE);
+-    memcpy(&lo, src + 62, 4);
+-    memcpy(&hi, src + 66, 4);
++    memcpy(dst, src, 18);
++    memcpy((u8 *)dst + 19, src + 18, GUNK_PACK_HEADER_SIZE - 19);
++    memcpy(&lo, src + 61, 4);
++    memcpy(&hi, src + 65, 4);
++    dst->language = (hi >> 29) & 7;
+     s0 = &GetSubstruct(dst, dst->personality, 0)->type0;
+     s1 = &GetSubstruct(dst, dst->personality, 1)->type1;
+     s0->species = lo & 0x3FF;
+     s0->heldItem = (lo >> 10) & 0x3FF;
+-    memcpy(&s0->experience, src + 28, 4);
+-    s0->ppBonuses = src[32];
+-    s0->friendship = src[33];
++    memcpy(&s0->experience, src + 27, 4);
++    s0->ppBonuses = src[31];
++    s0->friendship = src[32];
+     s1->moves[0] = (lo >> 20) & 0x3FF;
+     s1->moves[1] = (lo >> 30) | ((hi & 0xFF) << 2);
+     s1->moves[2] = (hi >> 8) & 0x3FF;
+     s1->moves[3] = (hi >> 18) & 0x3FF;
+-    memcpy(s1->pp, src + 34, MAX_MON_MOVES);
+-    memcpy(GetSubstruct(dst, dst->personality, 2), src + 38, NUM_SUBSTRUCT_BYTES);
+-    memcpy(GetSubstruct(dst, dst->personality, 3), src + 50, NUM_SUBSTRUCT_BYTES);
++    memcpy(s1->pp, src + 33, MAX_MON_MOVES);
++    memcpy(GetSubstruct(dst, dst->personality, 2), src + 37, NUM_SUBSTRUCT_BYTES);
++    memcpy(GetSubstruct(dst, dst->personality, 3), src + 49, NUM_SUBSTRUCT_BYTES);
+     dst->checksum = CalculateBoxMonChecksum(dst);
+     if (hi & GUNK_PACK_BAD_CHECKSUM)
+         dst->checksum ^= 0xFFFF;
+diff --git a/src/pokemon_storage_system.c b/src/pokemon_storage_system.c
+index d8ba51b77..024a89eb9 100644
+--- a/src/pokemon_storage_system.c
++++ b/src/pokemon_storage_system.c
+@@ -180,6 +180,7 @@ void Gunk_UpgradeBoxStorage(void)
+     }
+     if (gPokemonStoragePtr->currentBox >= TOTAL_BOXES_COUNT)
+         gPokemonStoragePtr->currentBox = 0;
++    memset(gPokemonStoragePtr->gunkPadding2, 0, sizeof(gPokemonStoragePtr->gunkPadding2));
+     gPokemonStoragePtr->gunkFormat = GUNK_BOX_FORMAT;
+ }
+ 
+diff --git a/src/save.c b/src/save.c
+index 7dbfbcb18..cc4831de9 100644
+--- a/src/save.c
++++ b/src/save.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++void JpBag_Upgrade(void);
+ #include "save.h"
+ #include "decompress.h"
+ #include "overworld.h"
+@@ -830,7 +831,10 @@ u8 LoadGameSave(u8 saveType)
+         LoadSerializedGame();
+         // Gunk's: a vanilla save's 14 boxes become the packed 16-box layout
+         if (result == SAVE_STATUS_OK)
++        {
+             Gunk_UpgradeBoxStorage();
++            JpBag_Upgrade(); // JP port: medicine/held items move to the new bag pockets
++        }
+         gSaveFileStatus = result;
+         gGameContinueCallback = NULL;
+         break;

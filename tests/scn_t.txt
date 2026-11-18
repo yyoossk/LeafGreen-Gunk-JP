@@ -1,0 +1,9 @@
+STATE
+LOG
+hold L 32
+run 10
+LOG
+hold U 32
+run 10
+LOG
+SHOT a

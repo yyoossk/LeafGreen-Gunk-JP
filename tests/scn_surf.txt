@@ -1,0 +1,30 @@
+STATE
+MON 0 7 57 33 0 0
+COUNT 1
+FLAG 824
+SEED 12345678
+run 5
+hold R 80
+hold U 80
+hold L 20
+run 200
+hold L 50
+run 20
+hold L 32
+hold D 120
+run 200
+LOG
+SHOT a
+hold D 96
+run 30
+LOG
+SHOT b
+hold L 64
+run 30
+LOG
+SHOT c
+hold D 96
+run 30
+LOG
+SHOT d
+SAVE shore

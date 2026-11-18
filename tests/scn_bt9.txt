@@ -1,0 +1,13 @@
+STATE
+hold U 32
+run 20
+hold L 48
+run 20
+tap U
+run 10
+tap A
+run 60
+SHOT a
+tap A
+run 60
+SHOT b

@@ -1,0 +1,43 @@
+STATE
+tap B
+run 30
+hold R 16
+run 10
+hold D 32
+run 10
+hold D 32
+run 150
+hold D 48
+run 10
+tap B
+run 20
+SB1 1C 2A 01 FF 00 13 00 18 00
+tap S
+run 20
+tap A
+run 60
+tap A
+run 30
+tap D
+run 5
+tap D
+run 5
+tap A
+run 60
+tap A
+run 400
+SHOT a
+tap D
+run 10
+tap A
+run 40
+SHOT b
+tap A
+run 40
+SHOT c
+tap A
+run 600
+SHOT d
+run 600
+SHOT e
+SAVE bt_back

@@ -1,0 +1,27 @@
+import sys; sys.path.insert(0, "/home/claude/tools")
+from story import *
+def go(g, rec):
+    g.handle(); g.trail = []; power_up(g)
+    step(g, rec, 'saffron', lambda: (tp(g, rec, 'SAFFRON_CITY', 24, 39), g.explore(rec)))
+    for h in ['SAFFRON_CITY_POKEMON_CENTER_1F', 'SAFFRON_CITY_MART', 'SAFFRON_CITY_HOUSE', 'SAFFRON_CITY_MR_PSYCHICS_HOUSE', 'SAFFRON_CITY_POKEMON_TRAINER_FAN_CLUB', 'SAFFRON_CITY_COPYCATS_HOUSE_1F']:
+        step(g, rec, h, lambda h=h: visit(g, rec, h, 'SAFFRON_CITY'))
+    step(g, rec, 'silph1f', lambda: (tp(g, rec, 'SAFFRON_CITY', 33, 31), g.go(['SILPH_CO_1F'], rec), g.explore(rec)))
+    step(g, rec, 'silph7f', lambda: (tp(g, rec, 'SILPH_CO_7F', 3, 5), walk(g, rec, 2, 5), g.handle(rec), talk(g, rec, 0, 7, 'lapras guy')))
+    step(g, rec, 'silph11f', lambda: (tp(g, rec, 'SILPH_CO_11F', 5, 13), walk(g, rec, 5, 15), g.handle(rec)))
+    step(g, rec, 'president', lambda: (tp(g, rec, 'SILPH_CO_11F', 9, 11), talk(g, rec, 9, 9, 'president'), g.explore(rec)))
+    step(g, rec, 'sabrina', lambda: (tp(g, rec, 'SAFFRON_CITY_GYM', 14, 13), talk(g, rec, 14, 11, 'sabrina')))
+    step(g, rec, 'dojo', lambda: (tp(g, rec, 'SAFFRON_CITY_DOJO', 6, 7), walk(g, rec, 5, 5), g.handle(rec), g.explore(rec)))
+    step(g, rec, 'snorlax12', lambda: (tp(g, rec, 'ROUTE12', 14, 68), talk(g, rec, 14, 70, 'snorlax')))
+    step(g, rec, 'route12', lambda: (tp(g, rec, 'ROUTE12', 14, 80), g.explore(rec)))
+    step(g, rec, 'route13', lambda: (tp(g, rec, 'ROUTE13', 40, 7), g.explore(rec)))
+    step(g, rec, 'route15', lambda: (tp(g, rec, 'ROUTE15', 40, 9), g.explore(rec)))
+    step(g, rec, 'fuchsia', lambda: (tp(g, rec, 'FUCHSIA_CITY', 25, 32), g.explore(rec)))
+    for h in ['FUCHSIA_CITY_POKEMON_CENTER_1F', 'FUCHSIA_CITY_MART', 'FUCHSIA_CITY_HOUSE1', 'FUCHSIA_CITY_HOUSE2', 'FUCHSIA_CITY_HOUSE3', 'FUCHSIA_CITY_SAFARI_ZONE_OFFICE', 'FUCHSIA_CITY_SAFARI_ZONE_ENTRANCE']:
+        step(g, rec, h, lambda h=h: visit(g, rec, h, 'FUCHSIA_CITY'))
+    step(g, rec, 'surf', lambda: (tp(g, rec, 'SAFARI_ZONE_SECRET_HOUSE', 5, 7), talk(g, rec, 6, 5, 'surf attendant')))
+    step(g, rec, 'teeth', lambda: (tp(g, rec, 'SAFARI_ZONE_WEST', 28, 15), talk(g, rec, 28, 14, 'gold teeth')))
+    step(g, rec, 'warden', lambda: (tp(g, rec, 'FUCHSIA_CITY_WARDENS_HOUSE', 3, 7), talk(g, rec, 3, 5, 'warden'), g.explore(rec)))
+    step(g, rec, 'koga', lambda: (tp(g, rec, 'FUCHSIA_CITY_GYM', 7, 15), talk(g, rec, 7, 13, 'koga')))
+    step(g, rec, 'snorlax16', lambda: (tp(g, rec, 'ROUTE16', 29, 13), talk(g, rec, 31, 13, 'snorlax16'), g.explore(rec)))
+    print(g.k, g.pos(), 'badge5', g.getflag(0x824), 'badge6', g.getflag(0x825), 'lapras', g.getflag(0x246), 'hm03', g.getflag(0x239), 'hm04', g.getflag(0x23A), 'snorlax', g.getflag(0x253), flush=True)
+run_segment('s19_saffron', 's18_celadon', go)
