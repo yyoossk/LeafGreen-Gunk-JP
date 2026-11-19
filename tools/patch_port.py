@@ -428,12 +428,24 @@ assert u32at(0x08218590)==0x0804761D; w8(0x08218590,struct.pack('<I',newsym['JpS
 # EWRAM は 0x02040000 を こえない
 _ee=[l for l in open(PORT+'/pb/port.map') if 'ewram_end = .' in l][0].split()[0]; assert int(_ee,16)<=0x02040000, ('EWRAM over', _ee)
 
-# --- タイトル画面の フシギバナを フルカラーに (tools/title/recolor.py で作った絵と色。マップはそのまま)
-_tp=open(PORT+'/data/hooks/title/title_mon.gbapal','rb').read(); assert len(_tp)==32
+# --- タイトル画面の フシギバナを フルカラーに (lgtools/title2/build.py: 公式の色で部位ごとに塗り分け。BG パレット 10〜13 の 4 本を使う)
+_tp=alloc(open(PORT+'/data/hooks/title/title_pals.bin','rb').read()); assert _tp
 assert rd(0x083808A8,4)==bytes.fromhex('5e320000'), rd(0x083808A8,8).hex()
-w8(0x083808A8,_tp)
-assert u32at(0x080781B4)==0x083808C8
+def _hw(a,old,new):
+    assert rd(a,2)==struct.pack('<H',old),(hex(a),rd(a,2).hex()); w8(a,struct.pack('<H',new))
+for _lit,_r1,_r2 in ((0x080781B0,0x0807812A,0x0807812C),(0x08078DCC,0x08078D78,0x08078D7A)):   # LoadPalette(mon, 13*16, 32) -> (new, 10*16, 128)
+    assert u32at(_lit)==0x083808A8; w8(_lit,struct.pack('<I',_tp)); _hw(_r1,0x21D0,0x21A0); _hw(_r2,0x2220,0x2280)
+# 登場演出: TintPalette_GrayScale2(&unfaded[13*16],16) -> (&unfaded[10*16],64)
+assert u32at(0x08078530)==0x020372CC; w8(0x08078530,struct.pack('<I',0x0203726C)); _hw(0x08078514,0x2110,0x2140)
+# CpuCopy16(mon pal, &unfaded[13*16], 32) -> (new, &unfaded[10*16], 128)
+assert u32at(0x0807869C)==0x083808A8 and u32at(0x080786A0)==0x020372CC
+w8(0x0807869C,struct.pack('<I',_tp)); w8(0x080786A0,struct.pack('<I',0x0203726C)); _hw(0x08078676,0x2210,0x2240)
+# フェード/点滅のマスク 1<<13 -> パレット 10〜13
+for _a in (0x0807851A,0x08078568,0x0807859E,0x080785C8,0x080785F0,0x0807861A,0x0807867C):
+    _hw(_a,0x2080,0x20F0); assert rd(_a+2,2)==bytes.fromhex('8001')
+assert u32at(0x080781B4)==0x083808C8 and u32at(0x080781B8)==0x0838132C
 _tt=alloc(open(PORT+'/data/hooks/title/title_mon.4bpp.lz','rb').read()); w8(0x080781B4,struct.pack('<I',_tt))
+_tm=alloc(open(PORT+'/data/hooks/title/title_map.bin.lz','rb').read()); w8(0x080781B8,struct.pack('<I',_tm))
 # FRLG+ vanilla tile-error fixes (tilesets + small layout fixes)
 exec(open('/home/claude/tools/tile_fix.py').read())
 if os.environ.get('V151'): exec(open('/home/claude/tools/v151_patch.py').read())
