@@ -133,7 +133,7 @@ class Game:
         return steps[::-1], cur
     def step(self, d):
         x, y, g, n = self.pos()
-        self.hold(d, 16); self.run(2)
+        self.hold(d, 16); self.run(6)   # walking (B dash) needs the step to finish before triggers fire
         return self.pos()[:2] != (x, y)
     def face(self, d):
         p0 = self.pos()
@@ -145,14 +145,16 @@ class Game:
         for t in range(tries):
             if handler and not self.idle(): handler(self)
             x, y, g, n = self.pos()
-            if (not adj and (x, y) == (tx, ty)) or (adj and abs(x - tx) + abs(y - ty) == 1): return True
+            if (not adj and (x, y) == (tx, ty)) or (adj and abs(x - tx) + abs(y - ty) == 1):
+                self.run(16)                  # let the last step finish (walking speed) so step triggers can fire
+                return True if self.idle() else 'event'
             r = self.path(tx, ty, adj)
             if not r: self.run(30); continue
             steps, _ = r
             for d in steps[:8]:
                 before = self.pos()
                 self.lastdir = d
-                self.hold(d, 16); self.run(2)
+                self.hold(d, 16); self.run(6)   # walking (B dash) needs the step to finish before triggers fire
                 if not self.idle():
                     return 'event'
                 if self.pos()[2:] != before[2:]: return 'warp'
