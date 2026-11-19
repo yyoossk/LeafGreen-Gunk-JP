@@ -428,6 +428,12 @@ assert u32at(0x08218590)==0x0804761D; w8(0x08218590,struct.pack('<I',newsym['JpS
 # EWRAM は 0x02040000 を こえない
 _ee=[l for l in open(PORT+'/pb/port.map') if 'ewram_end = .' in l][0].split()[0]; assert int(_ee,16)<=0x02040000, ('EWRAM over', _ee)
 
+# --- タイトル画面の フシギバナを フルカラーに (tools/title/recolor.py で作った絵と色。マップはそのまま)
+_tp=open(PORT+'/data/hooks/title/title_mon.gbapal','rb').read(); assert len(_tp)==32
+assert rd(0x083808A8,4)==bytes.fromhex('5e320000'), rd(0x083808A8,8).hex()
+w8(0x083808A8,_tp)
+assert u32at(0x080781B4)==0x083808C8
+_tt=alloc(open(PORT+'/data/hooks/title/title_mon.4bpp.lz','rb').read()); w8(0x080781B4,struct.pack('<I',_tt))
 # FRLG+ vanilla tile-error fixes (tilesets + small layout fixes)
 exec(open('/home/claude/tools/tile_fix.py').read())
 if os.environ.get('V151'): exec(open('/home/claude/tools/v151_patch.py').read())
