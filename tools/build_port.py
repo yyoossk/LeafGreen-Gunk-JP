@@ -65,7 +65,7 @@ SECTIONS {{
   rom_end = .;
   .v151 0x08F80000 : {{ *(.v151text) *(.v151data) }}
   . = 0x{EWRAM_BASE:08X};
-  ewram (NOLOAD) : {{ *(ewram_data) *(.bss) *(COMMON) }}
+  ewram (NOLOAD) : {{ *(ewram_data) *(.bss) *(COMMON) *(ewram_late) }}
   ewram_end = .;
   /DISCARD/ : {{ *(.comment) *(.ARM.attributes) }}
 }}

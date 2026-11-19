@@ -69,6 +69,7 @@
 #include "constants/songs.h"
 #include "constants/sound.h"
 #include "gunk_follower.h"
+#include "naming_screen.h"
 
 struct PartyMenuInternal
 {
@@ -109,6 +110,7 @@ enum
     CURSOR_OPTION_GUNK_WALK,
     CURSOR_OPTION_GUNK_RETURN,
     CURSOR_OPTION_JP_FORGET,
+    CURSOR_OPTION_JP_NICKNAME,
     CURSOR_OPTION_FIELD_MOVES,
 };
 
@@ -117,6 +119,21 @@ extern const u16 sFieldMoves[];
 void PartyMenuRemoveWindow(u8 *windowId);
 bool8 Gunk_CanUseHMMoveWithoutKnowing(struct Pokemon *mon, u16 move);
 void Task_ClosePartyMenu(u8 taskId);
+
+// 赤フルカラー: 手持ちの メニューで なまえを かえる (なまえ判定師と同じく、ほかの人から もらった ポケモンは だめ)
+static bool8 JpCanRenameMon(struct Pokemon *mon)
+{
+    u8 otName[PLAYER_NAME_LENGTH + 1];
+    u32 otId = GetMonData(mon, MON_DATA_OT_ID);
+
+    if (GetMonData(mon, MON_DATA_IS_EGG))
+        return FALSE;
+    if (otId != (gSaveBlock2Ptr->playerTrainerId[0] | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+               | (gSaveBlock2Ptr->playerTrainerId[2] << 16) | (gSaveBlock2Ptr->playerTrainerId[3] << 24)))
+        return FALSE;
+    GetMonData(mon, MON_DATA_OT_NAME, otName);
+    return StringCompareN(otName, gSaveBlock2Ptr->playerName, PLAYER_NAME_LENGTH) == 0;
+}
 
 void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
 {
@@ -139,6 +156,12 @@ void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     {
         AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, CURSOR_OPTION_JP_FORGET);
         maxFieldMoves--;
+    }
+    if (JpCanRenameMon(&mons[slotId]))
+    {
+        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, CURSOR_OPTION_JP_NICKNAME);
+        if (maxFieldMoves > 1)
+            maxFieldMoves--;
     }
     for (i = 0; i < MAX_MON_MOVES && numFieldMoves < maxFieldMoves; ++i)
     {
@@ -166,7 +189,8 @@ void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
         AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, CURSOR_OPTION_MAIL);
     else
         AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, CURSOR_OPTION_ITEM);
-    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, CURSOR_OPTION_CANCEL1);
+    if (sPartyMenuInternal->numActions < 8)
+        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, CURSOR_OPTION_CANCEL1);
 }
 
 void CursorCB_GunkWalk(u8 taskId)
@@ -214,6 +238,35 @@ void CursorCB_JpForget(u8 taskId)
     Task_ClosePartyMenu(taskId);
 }
 
+static void CB2_JpNicknameDone(void)
+{
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+
+    if (gStringVar2[0] != EOS)
+        SetMonData(mon, MON_DATA_NICKNAME, gStringVar2);
+    InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, CB2_ReturnToFieldWithOpenMenu);
+}
+
+static void CB2_JpNicknameStart(void)
+{
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+
+    GetMonData(mon, MON_DATA_NICKNAME, gStringVar2);
+    DoNamingScreen(NAMING_SCREEN_NICKNAME, gStringVar2, GetMonData(mon, MON_DATA_SPECIES), GetMonGender(mon),
+                   GetMonData(mon, MON_DATA_PERSONALITY), CB2_JpNicknameDone);
+}
+
+void CursorCB_JpNickname(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    gSpecialVar_0x8004 = gPartyMenu.slotId;
+    gPartyMenu.exitCallback = CB2_JpNicknameStart;
+    Task_ClosePartyMenu(taskId);
+}
+
+const u8 gText_JpNickname[] = _("なまえ");
 const u8 gText_JpForget[] = _("わすれさせる");
 const u8 gText_GunkWalk[] = _("つれあるく");
 const u8 gText_GunkReturn[] = _("もどす");

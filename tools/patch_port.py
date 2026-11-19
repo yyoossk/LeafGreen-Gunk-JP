@@ -301,18 +301,18 @@ patch16(0x081264EE,0xD803,0xE003)
 a,old=jp('sCursorOptions','party_menu.o')
 NOPT_OLD=18+12
 tbl=bytes(rom[old-0x08000000:old-0x08000000+8*NOPT_OLD])
-new=tbl[:8*18]+struct.pack('<II',newsym['gText_GunkWalk'],newsym['CursorCB_GunkWalk']|1)+struct.pack('<II',newsym['gText_GunkReturn'],newsym['CursorCB_GunkReturn']|1)+struct.pack('<II',newsym['gText_JpForget'],newsym['CursorCB_JpForget']|1)+tbl[8*18:]
+new=tbl[:8*18]+struct.pack('<II',newsym['gText_GunkWalk'],newsym['CursorCB_GunkWalk']|1)+struct.pack('<II',newsym['gText_GunkReturn'],newsym['CursorCB_GunkReturn']|1)+struct.pack('<II',newsym['gText_JpForget'],newsym['CursorCB_JpForget']|1)+struct.pack('<II',newsym['gText_JpNickname'],newsym['CursorCB_JpNickname']|1)+tbl[8*18:]
 end=(end+3)&~3; newtbl=end; w8(newtbl,new); end+=len(new)
 # repoint references (literal pools in code region)
 cnt=0
 for off in range(0,0x01E0000,4):
     w=struct.unpack_from('<I',rom,off)[0]
     if old<=w<old+8*NOPT_OLD:
-        d=w-old; nd=d if d<8*18 else d+24
+        d=w-old; nd=d if d<8*18 else d+32
         struct.pack_into('<I',rom,off,newtbl+nd); cnt+=1; print('  repoint',hex(off+0x08000000),hex(w),'->',hex(newtbl+nd))
 print('table refs repointed',cnt)
-# immediates CURSOR_OPTION_FIELD_MOVES 18 -> 20
-for at,old_hw,new_hw in [(0x0812262A,0x2811,0x2814),(0x0812283A,0x2E11,0x2E14),(0x081228A0,0x3812,0x3815),(0x08124E48,0x3812,0x3815)]:
+# immediates CURSOR_OPTION_FIELD_MOVES 18 -> 22 (WALK, RETURN, わすれさせる, なまえ)
+for at,old_hw,new_hw in [(0x0812262A,0x2811,0x2815),(0x0812283A,0x2E11,0x2E15),(0x081228A0,0x3812,0x3816),(0x08124E48,0x3812,0x3816)]:
     cur=struct.unpack_from('<H',rom,at-0x08000000)[0]; assert cur==old_hw,(hex(at),hex(cur)); struct.pack_into('<H',rom,at-0x08000000,new_hw)
 # 赤フルカラー: every Pokémon can learn all HMs (TMHM learnset word1 bits 18-25)
 _tm=0x0820ADC4-0x08000000
@@ -395,6 +395,39 @@ _ev=u32at(mapheader(4,0)+4); _ob=u32at(_ev+4)
 assert u32at(_ob+16)==0x0817B855; w8(_ob+16,struct.pack('<I',newsym['EventScript_JpMom']))
 # --- 「これまでの あらすじ」を出さない: TryStartQuestLogPlayback の beq -> b
 patch16(0x08111A7E,0xD00F,0xE00F)
+# --- 赤フルカラーの機能
+# island stubs live in the unused UnusedBlitBitmapRect (0x0812EE98-0x0812F074)
+_isl=[l for l in open(PORT+'/pb/port.map') if l.startswith('.island ')][0].split(); assert int(_isl[1],16)+int(_isl[2],16)<=0x0812F074, 'island overflow'
+# つりざお: かならず かかる (Fishing6: Random() & 1 -> & 0)
+assert rd(0x0805CDB2,2)==bytes.fromhex('0121'); w8(0x0805CDB2,bytes.fromhex('0021'))
+# セキエイこうげんの ショップで マスターボール (10000円)
+assert rd(0x08189745,5)==bytes.fromhex('8654971808'), rd(0x0818972F,30).hex(); w8(0x08189745,b'\x04'+struct.pack('<I',newsym['EventScript_JpIndigoMart']))
+assert r32(0x0839BD28+40+12)==0; w8(0x0839BD28+40+12,struct.pack('<H',10000))
+# ショップの 一覧の ねだんを 5けたに (マスターボール 10000円)
+assert rd(0x0809AD90,2)==bytes.fromhex('0423'); w8(0x0809AD90,bytes.fromhex('0523'))
+assert rd(0x0809ADB6,2)==bytes.fromhex('6023'); w8(0x0809ADB6,bytes.fromhex('5a23'))
+# わざを おぼえるときの「はい／いいえ」は「いいえ」から (Aの れんだで わざを うわがきしない)
+assert rd(0x08024B44,4)==bytes.fromhex('04484470'); w8(0x08024B44,bytes.fromhex('04494870'))
+assert rd(0x08024E74,4)==bytes.fromhex('03484470'); w8(0x08024E74,bytes.fromhex('03494870'))
+assert rd(0x080D02CE,2)==bytes.fromhex('0022'); w8(0x080D02CE,bytes.fromhex('0122'))
+assert rd(0x0812660A,4)==bytes.fromhex('fcf779f8'); bl(0x0812660A,newsym['Island_PartyYesNoDefaultNo'])
+assert rd(0x081269BE,4)==bytes.fromhex('fbf79ffe'); bl(0x081269BE,newsym['Island_PartyYesNoDefaultNo'])
+# バトル: わざの こうか・いりょく・めいちゅう、あいての HP (START で きりかえ)
+tramp(0x0803003C,newsym['JpMoveSelectionDisplayMoveType'])
+assert rd(0x0802E16E,4)==bytes.fromhex('05f01bf8'); bl(0x0802E16E,newsym['Island_ChooseMoveInput'])
+# ずかん: せつめいの ページで SELECT -> 種族値と しんか
+assert rd(0x08105384,4)==bytes.fromhex('02f070f9'); bl(0x08105384,newsym['Island_DexMonPageInput'])
+# そだてや: いまの レベル
+for _at,_txt,_s in [(0x08191410,0x081A581B,'EventScript_JpDaycareGrownFourIsland'),(0x081A54C0,0x0818C60F,'EventScript_JpDaycareGrownRoute5'),(0x081A54C9,0x0818C562,'EventScript_JpDaycareNotYetRoute5')]:
+    assert rd(_at,8)==b'\x0f\x00'+struct.pack('<I',_txt)+b'\x09\x04', rd(_at,8).hex()
+    w8(_at,b'\x04'+struct.pack('<I',newsym[_s])+b'\x00\x00\x00')   # msgbox (8 bytes) -> call + 3 nop
+# 殿堂入り: 伝説の ポケモンを もどす
+assert rd(0x0816A44F,5)==b'\x04'+struct.pack('<I',0x08193980); w8(0x0816A450,struct.pack('<I',newsym['EventScript_JpHoFFlags']))
+# あいての HP の数字: sHealthbarSpriteTemplates[1].callback
+assert u32at(0x08218590)==0x0804761D; w8(0x08218590,struct.pack('<I',newsym['JpSpriteCB_FoeHealthBar']|1))
+# EWRAM は 0x02040000 を こえない
+_ee=[l for l in open(PORT+'/pb/port.map') if 'ewram_end = .' in l][0].split()[0]; assert int(_ee,16)<=0x02040000, ('EWRAM over', _ee)
+
 # FRLG+ vanilla tile-error fixes (tilesets + small layout fixes)
 exec(open('/home/claude/tools/tile_fix.py').read())
 if os.environ.get('V151'): exec(open('/home/claude/tools/v151_patch.py').read())

@@ -1,0 +1,11 @@
+import sys; sys.path.insert(0,'/home/claude/tools')
+from walker import *
+g=Game('jp','/tmp/walkst/s21_postgame_jp.ss',rom=sys.argv[1]); g.run(10)
+g.teleport('SAFARI_ZONE_CENTER',26,30); g.run(30)
+g.setflag(0x800)
+g.cmd('poke 0203990E F0'); g.cmd('poke 0203990F 01'); g.cmd('poke 0203990C 1E')
+g.run(30); g.shot('/tmp/t2/sf0.png')
+g.hold('U',40); g.run(20); g.shot('/tmp/t2/sf1.png')
+g.tap('S'); g.run(30); g.shot('/tmp/t2/sf2.png')
+g.tap('B'); g.run(40); g.shot('/tmp/t2/sf3.png')
+g.close()

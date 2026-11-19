@@ -8,7 +8,7 @@ def runscript(data):
     for a,v in ((0x03000EB1,b'\x01'),(0x03000EB0,b'\x00'),(0x03000EB8,struct.pack('<I',buf)),(0x03000EA8,b'\x00')):
         for i,b in enumerate(v): g.cmd(f'poke {a+i:08X} {b:02X}')
     g.run(30)
-BS=0x0885e04d
+BS=0x0885e069
 # Brock scene without shoes
 runscript(bytes([4])+struct.pack('<I',BS)+b'\x02')
 print('no shoes: var',g.getvar(0x406C),'hide aide',g.getflag(0x92),'hide guide',g.getflag(0x2E))

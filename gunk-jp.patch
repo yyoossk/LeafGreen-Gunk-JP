@@ -29,8 +29,32 @@ index 876546ae5..a4e89af51 100644
  };
  
  u8 *GetBoxNamePtr(u8 boxNumber);
+diff --git a/src/battle_interface.c b/src/battle_interface.c
+index 54c38bf09..bf899aae7 100644
+--- a/src/battle_interface.c
++++ b/src/battle_interface.c
+@@ -1846,6 +1846,8 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
+ #define B_EXPBAR_NUM_PIXELS    64
+ #define B_EXPBAR_NUM_TILES     (B_EXPBAR_NUM_PIXELS / 8)
+ 
++void JpFoeHpBarStep(u8 battlerId, s32 value);
++
+ s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
+ {
+     s32 currentBarValue;
+@@ -1882,6 +1884,10 @@ s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
+     if (whichBar == EXP_BAR || (whichBar == HEALTH_BAR && !gBattleSpritesDataPtr->battlerData[battlerId].hpNumbersNoBars))
+         MoveBattleBarGraphically(battlerId, whichBar);
+ 
++    // JP port (赤フルカラー): the opponent's HP numbers follow its bar like the player's (hk_foe_hp.c)
++    if (whichBar == HEALTH_BAR)
++        JpFoeHpBarStep(battlerId, currentBarValue);
++
+     if (currentBarValue == -1)
+         gBattleSpritesDataPtr->battleBars[battlerId].currValue = 0;
+ 
 diff --git a/src/field_control_avatar.c b/src/field_control_avatar.c
-index 906d4a0e2..33f915fa7 100644
+index 906d4a0e2..517595cae 100644
 --- a/src/field_control_avatar.c
 +++ b/src/field_control_avatar.c
 @@ -1,4 +1,6 @@
@@ -40,7 +64,27 @@ index 906d4a0e2..33f915fa7 100644
  #include "gunk_follower.h"
  #include "gflib.h"
  #include "bike.h"
-@@ -222,6 +224,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+@@ -192,6 +194,8 @@ static void QuestLogOverrideJoyVars(struct FieldInput *input, u16 *newKeys, u16
+     ClearQuestLogInput();
+ }
+ 
++bool8 JpFieldInputExtras(void);
++
+ int ProcessPlayerFieldInput(struct FieldInput *input)
+ {
+     struct MapPosition position;
+@@ -214,6 +218,10 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+     if (TryRunOnFrameMapScript() == TRUE)
+         return TRUE;
+ 
++    // 赤フルカラー／FRLG+: 自転車の ギア (B)・ボックスの 自動きりかえ (JP port: hk_aka.c)
++    if (JpFieldInputExtras() == TRUE)
++        return TRUE;
++
+     if (input->tookStep)
+     {
+         IncrementGameStat(GAME_STAT_STEPS);
+@@ -222,6 +230,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
          RunMassageCooldownStepCounter();
          IncrementResortGorgeousStepCounter();
          IncrementBirthIslandRockStepCount();
@@ -48,7 +92,7 @@ index 906d4a0e2..33f915fa7 100644
          if (TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
          {
              gFieldInputRecord.tookStep = TRUE;
-@@ -298,6 +301,16 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+@@ -298,6 +307,16 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
      }
      if (input->pressedRButton && Gunk_UseSecondRegisteredItemOnField() == TRUE)
          return TRUE;

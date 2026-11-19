@@ -132,3 +132,64 @@ Island_CallR3c:
 Island_CallR4:
 	bx r4
 	.pool
+
+	.section .island,"ax"
+	.align 2
+
+	.section .island,"ax"
+	.align 2
+	.global Island_PartyYesNoDefaultNo
+	.thumb_func
+Island_PartyYesNoDefaultNo:  @ PartyMenuDisplayYesNoMenu with the cursor on いいえ (learning a move)
+	push {r4, lr}
+	sub sp, #12
+	movs r1, #0x4F
+	str r1, [sp, #0]
+	movs r1, #13
+	str r1, [sp, #4]
+	movs r1, #1
+	str r1, [sp, #8]
+	ldr r0, =0x08415178
+	movs r1, #2
+	movs r2, #2
+	movs r3, #2
+	bl 1f
+	add sp, #12
+	pop {r4}
+	pop {r0}
+	bx r0
+1:	ldr r4, =0x08110A71
+	bx r4
+	.pool
+
+	.section .island,"ax"
+	.align 2
+	.global Island_ChooseMoveInput
+	.thumb_func
+Island_ChooseMoveInput:   @ HandleInputChooseMove: PreviewDeterminativeMoveTargets + START (move info page)
+	push {r4, lr}
+	ldr r4, =0x080331A9
+	bl 2f
+	ldr r4, =JpChooseMoveCheckR
+	bl 2f
+	pop {r4}
+	pop {r0}
+	bx r0
+2:	bx r4
+	.pool
+
+	.section .island,"ax"
+	.align 2
+	.global Island_DexMonPageInput
+	.thumb_func
+Island_DexMonPageInput:   @ Task_DexScreen_ShowMonPage state 5: SELECT = stats / evolution, then START = cry
+	push {r4, lr}
+	ldr r4, =JpDexMonPageInput
+	bl 3f
+	ldr r4, =0x08107669
+	bl 3f
+	pop {r4}
+	pop {r0}
+	bx r0
+3:	bx r4
+	.pool
