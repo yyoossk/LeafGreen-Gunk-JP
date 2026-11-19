@@ -21,3 +21,30 @@ def labels():
             ImageDraw.Draw(lab).polygon(pts,fill=i+1)
     return lab
 NAMES=['body']+ORDER
+
+# 花びら: 輪郭(8,9)と背景で区切って塗りつぶし、その輪郭も花びらに含める。外れた所は葉っぱ
+_labels_poly=labels
+def labels():
+    lab=_labels_poly(); L=lab.load()
+    src=Image.open('render.png').load()
+    PET=ORDER.index('pet')+1; LEAF=ORDER.index('leaf')+1; TRK=ORDER.index('trk')+1
+    fill=set(); st=[(130,40),(180,40),(160,28),(140,30),(190,38)]
+    for s in st:
+        if src[s]>=10: fill.add(s)
+    st=list(fill)
+    while st:
+        x,y=st.pop()
+        for q in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)):
+            if q in fill or not(0<=q[0]<W and 0<=q[1]<=51): continue
+            if L[q]==TRK or src[q]<10: continue
+            fill.add(q); st.append(q)
+    edge=set()
+    for (x,y) in fill:
+        for dx in (-1,0,1):
+            for dy in (-1,0,1):
+                q=(x+dx,y+dy)
+                if q not in fill and src[q] in (6,7,8,9) and L[q]!=TRK: edge.add(q)
+    for y in range(H):
+        for x in range(W):
+            if L[x,y]==PET: L[x,y]=PET if ((x,y) in fill or (x,y) in edge or y<44) else LEAF
+    return lab
