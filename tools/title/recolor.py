@@ -7,24 +7,26 @@ PET=poly([(117,32),(150,22),(172,22),(206,29),(206,45),(192,46),(186,52),(171,52
 TRK=poly([(154,35),(168,35),(172,41),(172,52),(168,57),(155,57),(151,52),(151,41)])
 LEA=poly([(103,58),(116,51),(150,51),(150,56),(171,56),(171,51),(197,52),(218,60),(216,69),(201,69),(192,62),(176,58),(146,58),(132,62),(127,70),(116,71),(103,66)])
 CRW=poly([(156,34),(167,34),(168,38),(155,38)])
-MOU=poly([(145,82),(173,82),(173,86),(145,86)])
+MOU=poly([(145,82),(173,82),(171,90),(149,90)])
+FORE=poly([(150,56),(170,56),(168,65),(160,71),(152,65)])
 FNG=Image.new('L',(W,H),0); _d=ImageDraw.Draw(FNG); _d.rectangle((147,87,151,92),fill=255); _d.rectangle((167,87,171,92),fill=255)
 LEA2=poly([(147,44),(173,44),(173,58),(147,58)])
 EYE=Image.new('L',(W,H),0); d=ImageDraw.Draw(EYE); d.ellipse((138,69,149,79),fill=255); d.ellipse((171,69,182,79),fill=255)
-PAL=[(246,148,98),(24,40,40),
-     (32,88,104),(56,136,152),(96,184,184),(168,224,216),
-     (160,32,56),(216,64,88),(240,112,128),(255,226,226),
-     (24,96,40),(48,144,64),(128,200,104),
-     (64,40,48),(120,80,64),
-     (248,216,64)]
+PAL=[(246,148,98),(30,48,46),
+     (46,104,108),(60,142,146),(92,174,164),(146,210,200),
+     (170,64,92),(220,100,126),(240,140,160),(255,255,255),
+     (48,100,68),(86,148,100),(144,198,140),
+     (54,37,54),(116,74,80),
+     (232,192,96)]
 def mapc(s,reg,y=0):
     if s<6: return 0
     if s==6: return 1
-    if reg=='eye' and s>=13: return 7
-    if reg=='mou': return 6 if s<=9 else 7
-    if reg=='fng' and s>=12: return 9
+    if reg=='eye' and s>=14: return 9
+    if reg=='eye' and s>=12: return 7
+    if reg=='mou': return 1 if s<=7 else (6 if s<=9 else 8)
+    if reg=='fng': return 9 if s>=11 else (1 if s<=7 else 8)
     if reg=='crw': return 15 if s>=8 else 14
-    if reg=='pet': return {7:6,8:6,9:7,10:7,11:8,12:8}.get(s,9)
+    if reg=='pet': return {7:6,8:6,9:7,10:7,11:8,12:8,13:8,14:8}.get(s,9)
     if reg=='lea': return 10 if s<=9 else (11 if s<=12 else 12)
     if reg=='trk': return 13 if s<=10 else 14
     if s>=14 and y>=88: return 9   # claws
@@ -35,12 +37,12 @@ for y in range(H):
         s=src.getpixel((x,y))
         reg='body'
         if EYE.getpixel((x,y)): reg='eye'
-        elif MOU.getpixel((x,y)): reg='mou'
         elif FNG.getpixel((x,y)): reg='fng'
+        elif MOU.getpixel((x,y)): reg='mou'
         elif CRW.getpixel((x,y)): reg='crw'
         elif TRK.getpixel((x,y)): reg='trk'
         elif PET.getpixel((x,y)): reg='pet'
-        elif LEA.getpixel((x,y)) or LEA2.getpixel((x,y)): reg='lea'
+        elif LEA.getpixel((x,y)) or LEA2.getpixel((x,y)) or FORE.getpixel((x,y)): reg='lea'
         out.putpixel((x,y),mapc(s,reg,y))
 out.save('recolor.png')
 out.convert('RGB').crop((96,16,232,112)).resize((136*4,96*4),Image.NEAREST).save('/tmp/recolor.png')
