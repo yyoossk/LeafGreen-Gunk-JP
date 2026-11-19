@@ -41,16 +41,26 @@ sets={}
 for k in cells:
     cx,cy=k%32*8,k//32*8
     sets[k]=set(img[cy+j][cx+i] for j in range(8) for i in range(8) if img[cy+j][cx+i])
-pals=[]; assign={}; err=0
-for k in sorted(cells,key=lambda k:-len(sets[k])):
-    best=None
-    for i,pl in enumerate(pals):
-        u=len(pl|sets[k])
-        if u<=15 and (best is None or u<best[0]): best=(u,i)
-    if best: pals[best[1]]|=sets[k]; assign[k]=best[1]
-    elif len(pals)<4 and len(sets[k])<=15: pals.append(set(sets[k])); assign[k]=len(pals)-1
-    else:
-        i=min(range(len(pals)),key=lambda i:len(pals[i]|sets[k])); assign[k]=i; err+=1
+import random
+def pack(order):
+    pals=[]; assign={}; err=0
+    for k in order:
+        best=None
+        for i,pl in enumerate(pals):
+            u=len(pl|sets[k])
+            if u<=15 and (best is None or u<best[0]): best=(u,i)
+        if best: pals[best[1]]|=sets[k]; assign[k]=best[1]
+        elif len(pals)<4: pals.append(set(sets[k])); assign[k]=len(pals)-1
+        else:
+            i=min(range(len(pals)),key=lambda i:len(pals[i]|sets[k])); assign[k]=i; err+=1
+    return err,pals,assign
+rng=random.Random(1); bestr=None
+for t in range(3000):
+    order=sorted(cells,key=lambda k:-len(sets[k])) if t==0 else rng.sample(cells,len(cells))
+    r=pack(order)
+    if bestr is None or r[0]<bestr[0]: bestr=r
+    if r[0]==0: break
+err,pals,assign=bestr
 print('palettes',[len(p) for p in pals],'overflow tiles',err, 'max set',max(len(s) for s in sets.values()))
 # ---- emit
 import sys; sys.path.insert(0,'.')
