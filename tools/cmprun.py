@@ -1,7 +1,7 @@
 import sys,subprocess,struct,os
 sys.path.insert(0,'/home/claude/tools')
 import mkmon
-ROMS={'en':dict(rom='/home/claude/gunk/pokefirered_release.gba',party=0x02024284,cnt=0x02024029,obj=0x02036E50,rng=0x03005000,sb1=0x03005008),
+ROMS={'en':dict(rom='/home/claude/gunk_en/pokeleafgreen_release.gba',party=0x02024284,cnt=0x02024029,obj=0x02036E50,rng=0x03005000,sb1=0x03005008),
       'jp':dict(rom='/home/claude/work/port.gba',party=0x020241E4,cnt=0x02023F89,obj=0x02036D6C,rng=0x03004FA0,sb1=0x03004FA8)}
 def run(rom,cmds):
     r=subprocess.run(['/home/claude/emu/gbarun',rom,'-'],input='\n'.join(cmds)+'\n',capture_output=True,text=True)

@@ -7,8 +7,9 @@ for _l in open(_P + '/include/constants/species.h'):
     _m = _re.match(r'#define (SPECIES_\w+)\s+(\d+)\s*$', _l)
     if _m: _SP[_m.group(1)] = int(_m.group(2))
 _W = _js.load(open(_P + '/src/data/wild_encounters.json'))['wild_encounter_groups'][0]
-_FR = [e for e in _W['encounters'] if e['base_label'].endswith('_FireRed')]
-_LG = [e for e in _W['encounters'] if e['base_label'].endswith('_LeafGreen')]
+# LeafGreen: the ROM's own tables are the LeafGreen ones; the FireRed tables are added (used half of the time)
+_FR = [e for e in _W['encounters'] if e['base_label'].endswith('_LeafGreen')]   # own (in ROM)
+_LG = [e for e in _W['encounters'] if e['base_label'].endswith('_FireRed')]     # added
 _KINDS = ['land_mons', 'water_mons', 'rock_smash_mons', 'fishing_mons']
 _OLD = 0x0838C164; _N = 132
 
@@ -98,7 +99,7 @@ for _k in range(_nb):
     if u32at(_bg + 12 * _k + 8) == 0x08168775:
         w8(_bg + 12 * _k + 8, struct.pack('<I', _S('V151_EventScript_MewDiary'))); _n += 1
 assert _n == 1
-# Game Corner: Pinsir (2500 coins) in the Pokémon prize list (multichoice 14)
+# Game Corner: Scyther (5500 coins) in the Pokémon prize list (multichoice 14)
 assert rd(0x081855BC, 5) == bytes.fromhex('67e85a1808')
 w8(0x081855BC, b'\x05' + struct.pack('<I', _S('V151_EventScript_ChoosePrizeMon')))
 _mct = u32at(0x0809C480); _l14 = u32at(_mct + 8 * 14); assert rom[_mct + 8 * 14 + 4 - 0x08000000] == 6
@@ -107,8 +108,8 @@ _enc = {}
 for _line in open('/home/claude/port/charmap.txt', encoding='utf-8'):
     _mm = _re.match(r"^'(.)'\s*=\s*([0-9A-Fa-f]{2})\s*$", _line.split('@')[0].strip())
     if _mm: _enc.setdefault(_mm.group(1), int(_mm.group(2), 16))
-_pins = alloc(bytes(_enc[c] for c in 'カイロス') + bytes.fromhex('0000fc0600') + bytes(_enc[c] for c in '2500') + bytes.fromhex('1f02ff'))
-_newl = alloc(_old[0] + _old[1] + struct.pack('<II', _pins, 0) + _old[2] + _old[3] + _old[4] + _old[5])
+_pins = alloc(bytes(_enc[c] for c in 'ストライク') + bytes.fromhex('00fc0600') + bytes(_enc[c] for c in '5500') + bytes.fromhex('1f02ff'))
+_newl = alloc(_old[0] + _old[1] + _old[2] + _old[3] + struct.pack('<II', _pins, 0) + _old[4] + _old[5])
 w8(_mct + 8 * 14, struct.pack('<IB', _newl, 7))
 # Celadon Dept. Store 4F: Moon Stone 2100
 assert u32at(0x08183877) == 0x08183888

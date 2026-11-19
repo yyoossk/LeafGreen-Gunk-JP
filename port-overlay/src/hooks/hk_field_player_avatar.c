@@ -71,7 +71,8 @@ void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
         return;
     }
 
-    if (!(heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
+    // B ダッシュ（ユーザーの指示）：B を押している間だけ走る（Gunk のオートランはやめた）
+    if ((heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
         && !IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior))
     {
         if (PlayerIsMovingOnRockStairs(direction))

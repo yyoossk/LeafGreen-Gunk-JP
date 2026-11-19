@@ -1,0 +1,10 @@
+import sys; sys.path.insert(0,'/home/claude/tools')
+from walker import *
+g=Game('jp','/tmp/t2/after_reload.ss',rom=sys.argv[1]); g.run(10)
+g.hold('L',40); g.hold('R',20); g.run(30)   # walk a little (quest log records)
+g.tap('S'); g.run(30); g.tap('D',5); g.run(10); g.shot('/tmp/t2/q0.png')
+g.tap('A'); g.run(90); g.shot('/tmp/t2/q1.png'); g.tap('A'); g.run(500); g.shot('/tmp/t2/q2.png'); g.tap('A'); g.run(60)
+print('saved?', g.idle())
+g.cmd('reset'); g.run(1200); g.tap('S'); g.run(120); g.tap('S'); g.run(240); g.shot('/tmp/t2/q3.png'); g.tap('A'); g.run(240); g.shot('/tmp/t2/q4.png'); g.tap('A'); g.run(240)
+g.run(60); g.shot('/tmp/t2/q5.png'); g.run(300); g.shot('/tmp/t2/q6.png'); print('after continue',g.in_overworld(),g.pos())
+g.close()

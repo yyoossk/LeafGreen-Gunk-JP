@@ -170,7 +170,8 @@ V151_Text_MewAppears:
 	.string "…… ページの あいだから\n"
 	.string "なにかが とびだしてきた！$"
 
-@ ---------------------------------------------------------------- Game Corner: Pinsir 2500 coins
+@ ---------------------------------------------------------------- Game Corner: Scyther 5500 coins (LeafGreen)
+@ JP LeafGreen labels: JP_Prize_Dratini = Pinsir 2500, JP_Prize_Scyther = Dratini 4600 (the shared FR/LG script labels)
 V151_EventScript_ChoosePrizeMon::
 	message JP_Text_WhichPrize
 	waitmessage
@@ -178,14 +179,14 @@ V151_EventScript_ChoosePrizeMon::
 	copyvar VAR_0x8000, VAR_RESULT
 	goto_if_eq VAR_0x8000, 0, JP_Prize_Abra
 	goto_if_eq VAR_0x8000, 1, JP_Prize_Clefairy
-	goto_if_eq VAR_0x8000, 2, V151_Prize_Pinsir
-	goto_if_eq VAR_0x8000, 3, JP_Prize_Dratini
-	goto_if_eq VAR_0x8000, 4, JP_Prize_Scyther
+	goto_if_eq VAR_0x8000, 2, JP_Prize_Dratini
+	goto_if_eq VAR_0x8000, 3, JP_Prize_Scyther
+	goto_if_eq VAR_0x8000, 4, V151_Prize_Scyther
 	goto_if_eq VAR_0x8000, 5, JP_Prize_Porygon
 	goto JP_Prize_End
-V151_Prize_Pinsir:
-	setvar VAR_TEMP_1, SPECIES_PINSIR
-	setvar VAR_TEMP_2, 2500
+V151_Prize_Scyther:
+	setvar VAR_TEMP_1, SPECIES_SCYTHER
+	setvar VAR_TEMP_2, 5500
 	goto JP_Prize_Confirm
 
 @ ---------------------------------------------------------------- Celadon 4F: Moon Stone 2100

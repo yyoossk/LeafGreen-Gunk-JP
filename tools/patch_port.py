@@ -377,6 +377,24 @@ patch16(0x080F93A8,0xB085,0xB086); patch16(0x080F9422,0xB005,0xB006)
 # pret BUGFIX: intro fight-scene sprite palette list had no terminator (LoadSpritePalettes read garbage after it)
 assert u32at(0x080EFB84)==0x083CD8B4
 w8(0x080EFB84,struct.pack('<I',alloc(bytes(rom[0x003CD8B4:0x003CD8B4+40])+bytes(8))))
+# --- メニューから パソコン (start menu item 9)
+tramp(0x0806E51C,newsym['JpSetUpStartMenu_NormalField'])
+assert rd(0x0806EB00,4)==bytes.fromhex('00b50848'); tramp(0x0806EB00,newsym['JpStartMenu_FadeScreenIfLeavingOverworld'])
+_na=alloc(rd(0x08366B14,72)+struct.pack('<II',newsym['gJpText_MenuPC'],newsym['JpStartMenuPcCallback']|1))
+for _r in (0x0806E708,0x0806EAE0,0x0806EB60):
+    assert u32at(_r)==0x08366B14; w8(_r,struct.pack('<I',_na))
+_nd=alloc(rd(0x08366B64,36)+struct.pack('<I',newsym['gJpStartMenuDesc_PC']))
+for _r in (0x0806E8A4,0x0806EAD4):
+    assert u32at(_r)==0x08366B64; w8(_r,struct.pack('<I',_nd))
+assert rd(0x08193EAA,5)==bytes.fromhex('1604800000')
+w8(0x08193EAA,b'\x05'+struct.pack('<I',newsym['EventScript_JpTurnOffPC']))
+# --- ランニングシューズは おかあさんから
+assert rd(0x0817F41A,11)==bytes.fromhex('166c400100292e002a9200')
+w8(0x0817F41A,b'\x04'+struct.pack('<I',newsym['EventScript_JpBrockScene'])+bytes(6))
+_ev=u32at(mapheader(4,0)+4); _ob=u32at(_ev+4)
+assert u32at(_ob+16)==0x0817B855; w8(_ob+16,struct.pack('<I',newsym['EventScript_JpMom']))
+# --- 「これまでの あらすじ」を出さない: TryStartQuestLogPlayback の beq -> b
+patch16(0x08111A7E,0xD00F,0xE00F)
 # FRLG+ vanilla tile-error fixes (tilesets + small layout fixes)
 exec(open('/home/claude/tools/tile_fix.py').read())
 if os.environ.get('V151'): exec(open('/home/claude/tools/v151_patch.py').read())

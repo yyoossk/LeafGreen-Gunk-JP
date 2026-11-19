@@ -1,6 +1,6 @@
-// 151匹揃う版: wild encounters use the LeafGreen table half of the time.
-// gWildMonHeaders is relocated to [FireRed 132][LeafGreen 132][terminator] by tools/v151_patch.py,
-// so index i + JP_NUM_WILD_HEADERS is the LeafGreen table of the same map.
+// 151匹揃う版 (LeafGreen): wild encounters use the FireRed table half of the time.
+// gWildMonHeaders is relocated to [LeafGreen 132][FireRed 132][terminator] by tools/v151_patch.py,
+// so index i + JP_NUM_WILD_HEADERS is the FireRed table of the same map.
 #include "global.h"
 #include "event_data.h"
 #include "random.h"

@@ -15,14 +15,14 @@ OLD = 0x0838C164
 first = R[OLD - 0x08000000: OLD - 0x08000000 + 20]
 NEW = R.find(first, 0xB80000) + 0x08000000
 J = json.load(open(P + '/src/data/wild_encounters.json'))['wild_encounter_groups'][0]
-FR = [e for e in J['encounters'] if e['base_label'].endswith('_FireRed')]
+FR = [e for e in J['encounters'] if e['base_label'].endswith('_LeafGreen')]   # LeafGreen: own tables first, then the added FireRed ones
 src = {}
 def add(sp, s):
     src.setdefault(sp, [])
     if s not in src[sp]: src[sp].append(s)
 KIND = ['草むら', 'なみのり', 'いわくだき', 'つり']
 mapjp = {}
-for half, lab in ((0, 'FR'), (1, 'LG')):
+for half, lab in ((0, 'LG'), (1, 'FR')):
     for i in range(132):
         h = NEW + 20 * (132 * half + i)
         mp = FR[i]['map'].replace('MAP_', '')
@@ -41,8 +41,8 @@ STATIC = {
  'AERODACTYL': 'ひみつのコハク', 'SNORLAX': '12・16ばんどうろ', 'ARTICUNO': 'ふたごじま', 'ZAPDOS': 'むじんはつでんしょ',
  'MOLTRES': 'ともしびやま', 'MEWTWO': 'ハナダのどうくつ', 'MEW': 'ポケモンやしき B1F 日記 Lv50（捕まえるまで何度でも）',
  'ELECTRODE': 'むじんはつでんしょ（ビリリダマのふり）', 'VOLTORB': 'むじんはつでんしょ（ビリリダマのふり）',
- 'ABRA': 'ゲームコーナー景品', 'CLEFAIRY': 'ゲームコーナー景品', 'PINSIR': 'ゲームコーナー景品（2500枚）',
- 'DRATINI': 'ゲームコーナー景品', 'SCYTHER': 'ゲームコーナー景品', 'PORYGON': 'ゲームコーナー景品'}
+ 'ABRA': 'ゲームコーナー景品', 'CLEFAIRY': 'ゲームコーナー景品', 'PINSIR': 'ゲームコーナー景品',
+ 'DRATINI': 'ゲームコーナー景品', 'SCYTHER': 'ゲームコーナー景品（5500枚）', 'PORYGON': 'ゲームコーナー景品'}
 for k, v in STATIC.items(): add(SP[k], v)
 # in-game trades (FR)
 for m in re.finditer(r'\.species = SPECIES_(\w+),', open(P + '/src/data/ingame_trades.h').read()):
@@ -72,7 +72,7 @@ for i in range(1, 152):
     w = ''
     if wild:
         fr = sorted({x.split(' ', 1)[1] for x in wild if '(FR)' in x}); lg = sorted({x.split(' ', 1)[1] for x in wild if '(LG)' in x})
-        w = '野生 ' + (f'FR:{len(fr)}か所' if fr else '') + (' ' if fr and lg else '') + (f'LG:{len(lg)}か所' if lg else '') + ' 例:' + (fr or lg)[0]
+        w = '野生 ' + (f'LG:{len(lg)}か所' if lg else '') + (' ' if fr and lg else '') + (f'FR:{len(fr)}か所' if fr else '') + ' 例:' + (lg or fr)[0]
     out.append((i, inv[i], ' / '.join(([w] if w else []) + oth)))
 md = ['| No. | ポケモン | 入手方法 |', '|---|---|---|']
 NT = 0x1FF4B2 - 6   # JP gSpeciesNames (6 bytes each)
