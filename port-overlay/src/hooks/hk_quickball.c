@@ -35,7 +35,9 @@ bool8 JpQuickBall_Input(void)
         PlayerBufferExecCompleted();
         return TRUE;
     }
-    if (JOY_NEW(A_BUTTON | B_BUTTON))
+    /* A ends the action menu. B doesn't in a single battle (it only cancels the partner's choice in a double
+       battle, where the widget isn't shown), so B leaves the widget on screen */
+    if (JOY_NEW(A_BUTTON))
         Gunk_QuickBall_Hide();
     return FALSE;
 }
