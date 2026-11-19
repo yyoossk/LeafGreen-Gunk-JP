@@ -593,6 +593,8 @@ static bool8 IsWarpEventAt(s16 x, s16 y)
     return FALSE;
 }
 
+static u8 GetCollisionWithout(struct ObjectEvent *ignored, struct ObjectEvent *mover, s16 x, s16 y, u8 direction);
+
 static bool8 IsFollowerWalkableTile(struct ObjectEvent *mover, s16 x, s16 y, u8 direction)
 {
     if (direction < DIR_SOUTH || direction > DIR_EAST) /* Gunk's: see FindFollowerTileNearPlayer */
@@ -632,13 +634,24 @@ static u8 GetFollowerStepAction(struct ObjectEvent *followerObj, u8 direction, b
 
     MoveCoords(direction, &x, &y);
     if (IsFollowerWalkableTile(followerObj, x, y, direction))
-        return fast ? GetWalkFastMovementAction(direction) : GetWalkNormalMovementAction(direction);
+        return fast >= 2 ? GetWalkFasterMovementAction(direction)
+             : fast ? GetWalkFastMovementAction(direction) : GetWalkNormalMovementAction(direction);
 
     if (GetLedgeJumpDirection(x, y, direction) != DIR_NONE)
     {
         MoveCoords(direction, &x, &y);
         if (IsFollowerWalkableTile(followerObj, x, y, direction))
             return GetJump2MovementAction(direction);
+        /* Japanese port: the player is already stepping off the landing tile (it only still counts as their
+           previous tile): jump now, so the follower keeps up with a running player over a ledge */
+        {
+            struct ObjectEvent *playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
+            if (fast && playerObj->previousCoords.x == x && playerObj->previousCoords.y == y
+             && (playerObj->currentCoords.x != x || playerObj->currentCoords.y != y)
+             && GetCollisionWithout(playerObj, followerObj, x, y, direction) == COLLISION_NONE
+             && !IsWarpEventAt(x, y) && !MetatileBehavior_IsSurfable(MapGridGetMetatileBehaviorAt(x, y)))
+                return GetJump2MovementAction(direction);
+        }
     }
     return MOVEMENT_ACTION_NONE;
 }
@@ -1281,6 +1294,19 @@ static void ApplyFollowerHalfTileOffset(struct ObjectEvent *followerObj)
     sprite->y2 = oy;
 }
 
+/*
+ * Japanese port (user's request): when the player runs or rides the bicycle and the follower has dropped off
+ * the player's trail (after a ledge jump, a turn it couldn't copy), it comes back at the player's speed
+ * instead of a walk: 0 = walk, 1 = walk fast (the running speed, 8 frames a tile), 2 = walk faster
+ * (4 frames a tile) to close a gap of 3 tiles or more, so it is soon right behind the player again.
+ */
+static u8 JpFollowerCatchUpSpeed(s16 dist)
+{
+    if (!(gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_DASH | PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE)))
+        return dist >= 3 ? 1 : 0;   /* walking: a follower left 3 tiles behind (after a ledge) hurries back too */
+    return dist >= 3 ? 2 : 1;
+}
+
 void UpdateFollowerPokemon(void)
 {
     struct ObjectEvent *playerObj;
@@ -1403,13 +1429,13 @@ void UpdateFollowerPokemon(void)
                 return;
             }
         }
-        TryFollowerStepTowardPlayer(followerObj, playerObj, FALSE);
+        TryFollowerStepTowardPlayer(followerObj, playerObj, JpFollowerCatchUpSpeed(dist));
         return;
     }
 
     /* The player stands still: a follower more than one tile away comes up behind */
     if (dist > 1)
-        TryFollowerStepTowardPlayer(followerObj, playerObj, FALSE);
+        TryFollowerStepTowardPlayer(followerObj, playerObj, JpFollowerCatchUpSpeed(dist));
 }
 
 /*

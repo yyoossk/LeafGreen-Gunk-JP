@@ -27,7 +27,7 @@ void JpSetUpStartMenu_NormalField(void)
     JpAppendToStartMenuItems(3);
     JpAppendToStartMenuItems(4);
     JpAppendToStartMenuItems(5);
-    JpAppendToStartMenuItems(6);
+    /* 「とじる」(6) は出さない：パソコンを足して 9こに なると 説明の まどの下に はみ出すため。Bボタンで とじられる */
 }
 
 bool8 JpStartMenuPcCallback(void)

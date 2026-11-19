@@ -74,7 +74,7 @@ void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
     // B dash (like the original game): with the Running Shoes, run while B is held
     // (Gunk ran by default and walked with B; changed back at the user's request)
     if ((heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
-        && !IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior))
+        && !MetatileBehavior_IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior)) // 屋内でも走れる（走れないタイルだけ止める）
     {
         if (PlayerIsMovingOnRockStairs(direction))
             PlayerRunSlow(direction);
