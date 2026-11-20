@@ -60,24 +60,15 @@ Island_CallR3b:
 
 	.global Island_HelpCheck
 	.thumb_func
-Island_HelpCheck:         @ RunHelpSystemCallback: in the field R belongs to the second registered item
+Island_HelpCheck:         @ RunHelpSystemCallback: in the field L opens the party and R the bag (JP port), so no Help there
 	push {r2, r4, lr}
 	ldrh r4, [r2, #46]
-	movs r0, #128
-	lsls r0, r0, #1
-	tst r4, r0
-	beq 9f
 	ldr r0, [r2]
 	ldr r1, =0x08055DD1
 	cmp r0, r1
 	bne 9f
-	ldr r0, =0x402A
-	ldr r3, =VarGet
-	bl Island_CallR3b
-	cmp r0, #0
-	beq 9f
-	movs r0, #128
-	lsls r0, r0, #1
+	movs r0, #192
+	lsls r0, r0, #2
 	bics r4, r0
 9:	ldr r3, =Gunk_IsChoosingBattleAction
 	bl Island_CallR3b

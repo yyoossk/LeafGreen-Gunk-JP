@@ -54,7 +54,7 @@ index 54c38bf09..bf899aae7 100644
          gBattleSpritesDataPtr->battleBars[battlerId].currValue = 0;
  
 diff --git a/src/field_control_avatar.c b/src/field_control_avatar.c
-index 906d4a0e2..517595cae 100644
+index 906d4a0e2..75c9e28f6 100644
 --- a/src/field_control_avatar.c
 +++ b/src/field_control_avatar.c
 @@ -1,4 +1,6 @@
@@ -64,16 +64,17 @@ index 906d4a0e2..517595cae 100644
  #include "gunk_follower.h"
  #include "gflib.h"
  #include "bike.h"
-@@ -192,6 +194,8 @@ static void QuestLogOverrideJoyVars(struct FieldInput *input, u16 *newKeys, u16
+@@ -192,6 +194,9 @@ static void QuestLogOverrideJoyVars(struct FieldInput *input, u16 *newKeys, u16
      ClearQuestLogInput();
  }
  
 +bool8 JpFieldInputExtras(void);
++bool8 JpFieldLRMenu(struct FieldInput *input);
 +
  int ProcessPlayerFieldInput(struct FieldInput *input)
  {
      struct MapPosition position;
-@@ -214,6 +218,10 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+@@ -214,6 +219,10 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
      if (TryRunOnFrameMapScript() == TRUE)
          return TRUE;
  
@@ -84,7 +85,7 @@ index 906d4a0e2..517595cae 100644
      if (input->tookStep)
      {
          IncrementGameStat(GAME_STAT_STEPS);
-@@ -222,6 +230,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+@@ -222,6 +231,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
          RunMassageCooldownStepCounter();
          IncrementResortGorgeousStepCounter();
          IncrementBirthIslandRockStepCount();
@@ -92,9 +93,13 @@ index 906d4a0e2..517595cae 100644
          if (TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
          {
              gFieldInputRecord.tookStep = TRUE;
-@@ -298,6 +307,16 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+@@ -296,8 +306,19 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
+         gFieldInputRecord.pressedSelectButton = TRUE;
+         return TRUE;
      }
-     if (input->pressedRButton && Gunk_UseSecondRegisteredItemOnField() == TRUE)
+-    if (input->pressedRButton && Gunk_UseSecondRegisteredItemOnField() == TRUE)
++    // JP port: L opens the party, R opens the bag (instead of Help / the second registered item)
++    if (JpFieldLRMenu(input) == TRUE)
          return TRUE;
 +    // JP port (FRLG+): B on the bike switches between the normal gear and a Mach Bike gear (not on Cycling Road)
 +    if (input->pressedBButton && (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
@@ -122,6 +127,36 @@ index f91c4748e..e901b63c7 100644
  
  // BG0, two rows above the action prompt. While the action menu shows, BG0 is scrolled to rows 20-39, so rows 33-34
  // are the screen's 13-14; every other page of BG0 (messages, moves) leaves them off screen. Tiles 0x2D0-0x2FF are
+diff --git a/src/item_menu.c b/src/item_menu.c
+index ab3690168..73a76c4e5 100644
+--- a/src/item_menu.c
++++ b/src/item_menu.c
+@@ -1602,21 +1602,12 @@ static void Task_ItemMenuAction_ToggleSelect(u8 taskId)
+     u16 itemId;
+     s16 *data = gTasks[taskId].data;
+     itemId = BagGetItemIdByPocketPosition(gBagMenuState.pocket + 1, data[1]);
+-    // Gunk's two registered items: the latest on SELECT, the one before it on R
+-    if (gSaveBlock1Ptr->registeredItem == itemId)
+-    {
+-        gSaveBlock1Ptr->registeredItem = VarGet(VAR_GUNK_REGISTERED_ITEM_2);
+-        VarSet(VAR_GUNK_REGISTERED_ITEM_2, ITEM_NONE);
+-    }
+-    else if (VarGet(VAR_GUNK_REGISTERED_ITEM_2) == itemId)
+-    {
+-        VarSet(VAR_GUNK_REGISTERED_ITEM_2, ITEM_NONE);
+-    }
++    // JP port: R opens the bag in the field, so only SELECT can be registered again (the old R item is dropped)
++    if (gSaveBlock1Ptr->registeredItem == itemId || VarGet(VAR_GUNK_REGISTERED_ITEM_2) == itemId)
++        gSaveBlock1Ptr->registeredItem = ITEM_NONE;
+     else
+-    {
+-        VarSet(VAR_GUNK_REGISTERED_ITEM_2, gSaveBlock1Ptr->registeredItem);
+         gSaveBlock1Ptr->registeredItem = itemId;
+-    }
++    VarSet(VAR_GUNK_REGISTERED_ITEM_2, ITEM_NONE);
+ 
+     DestroyListMenuTask(data[0], &gBagMenuState.cursorPos[gBagMenuState.pocket], &gBagMenuState.itemsAbove[gBagMenuState.pocket]);
+     Bag_BuildListMenuTemplate(gBagMenuState.pocket);
 diff --git a/src/pokemon.c b/src/pokemon.c
 index f12728568..87bb823b3 100644
 --- a/src/pokemon.c
