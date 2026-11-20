@@ -232,7 +232,7 @@ V151_\name\()_After:
 	release
 	end
 V151_\name\()_Declined:
-	msgbox V151_Text_Declined
+	msgbox V151_Text_\name\()Declined
 	release
 	end
 V151_\name\()_Fanfare:
@@ -254,9 +254,15 @@ V151_Squirtle_NoBadge:
 	release
 	end
 
-V151_Text_Declined:
+V151_Text_BulbasaurDeclined:
 	.string "そう……\n"
 	.string "きが かわったら また きてね$"
+V151_Text_CharmanderDeclined:
+	.string "そうか……\n"
+	.string "きが かわったら また こいよ$"
+V151_Text_SquirtleDeclined:
+	.string "そうか……\n"
+	.string "きが かわったら また きて くれ$"
 
 V151_Text_BulbaOffer:
 	.string "この フシギダネ……\n"
@@ -290,17 +296,17 @@ V151_Text_CharAfter:
 
 V151_Text_SquirtNoBadge:
 	.string "この ゼニガメ いたずらばかりで\n"
-	.string "こまってるの\p"
+	.string "こまって いるんだ\p"
 	.string "クチバジムの バッジを もっている\n"
-	.string "トレーナーなら まかせられるのに……$"
+	.string "トレーナーなら まかせられるんだが……$"
 V151_Text_SquirtOffer:
 	.string "それは オレンジバッジ！\p"
-	.string "あなたなら まかせられるわ\p"
+	.string "きみなら まかせられるな\p"
 	.string "この ゼニガメを\n"
-	.string "つれていって くれる？$"
+	.string "つれていって くれないか？$"
 V151_Text_GotSquirt:
 	.string "{PLAYER}は\n"
 	.string "ゼニガメを もらった！$"
 V151_Text_SquirtAfter:
-	.string "ゼニガメ いいこに してる？\n"
-	.string "あなたに まかせて よかったわ！$"
+	.string "ゼニガメは いいこに してるかい？\n"
+	.string "きみに まかせて よかったよ！$"
