@@ -42,3 +42,28 @@ Text_JpMedicinePocket:
 	.string "くすりポケット$"
 Text_JpHeldItemsPocket:
 	.string "もちものポケット$"
+
+@ Std_PutItemAway（giveitem_msg・msgreceiveditem の「〜ポケットに しまった」）の ポケットの なまえ（0x08195FAC）も
+@ 1〜5 しか みず、くすり・もちものの どうぐを もらうと スクリプトが とちゅうで おわっていた
+@（オーキドの じょしゅの かわらずのいし：フラグが たたず なんども もらえる）。
+	.set JpEventScript_PutAwayItems, 0x08195FE9
+	.set JpEventScript_PutAwayKeyItems, 0x08195FEE
+	.set JpEventScript_PutAwayPokeBalls, 0x08195FF3
+	.set JpEventScript_PutAwayTMCase, 0x08195FF8
+	.set JpEventScript_PutAwayBerryPouch, 0x08195FFD
+EventScript_JpBufferPutAwayPocketName::
+	copyvar VAR_0x8000, VAR_RESULT
+	goto_if_eq VAR_0x8000, 1, JpEventScript_PutAwayItems
+	goto_if_eq VAR_0x8000, 2, JpEventScript_PutAwayKeyItems
+	goto_if_eq VAR_0x8000, 3, JpEventScript_PutAwayPokeBalls
+	goto_if_eq VAR_0x8000, 4, JpEventScript_PutAwayTMCase
+	goto_if_eq VAR_0x8000, 5, JpEventScript_PutAwayBerryPouch
+	goto_if_eq VAR_0x8000, 12, EventScript_JpPutAwayMedicine
+	goto_if_eq VAR_0x8000, 13, EventScript_JpPutAwayHeldItems
+	end
+EventScript_JpPutAwayMedicine:
+	bufferstring STR_VAR_3, Text_JpMedicinePocket
+	return
+EventScript_JpPutAwayHeldItems:
+	bufferstring STR_VAR_3, Text_JpHeldItemsPocket
+	return
