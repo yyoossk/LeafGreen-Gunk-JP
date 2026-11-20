@@ -70,11 +70,16 @@ Island_HelpCheck:         @ RunHelpSystemCallback: in the field L opens the part
 	movs r0, #192
 	lsls r0, r0, #2
 	bics r4, r0
-9:	ldr r3, =Gunk_IsChoosingBattleAction
+9:	ldr r0, =0x439            @ gMain.inBattle (bit 1): no Help on L/R anywhere in a battle
+	ldrb r0, [r2, r0]
+	movs r1, #2
+	tst r0, r1
+	bne 11f
+	ldr r3, =Gunk_IsChoosingBattleAction
 	bl Island_CallR3b
 	cmp r0, #0
 	beq 10f
-	movs r0, #192
+11:	movs r0, #192
 	lsls r0, r0, #2
 	bics r4, r0
 10:	adds r1, r4, #0
