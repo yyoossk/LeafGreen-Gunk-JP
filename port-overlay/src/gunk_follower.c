@@ -634,7 +634,8 @@ static u8 GetFollowerStepAction(struct ObjectEvent *followerObj, u8 direction, b
 
     MoveCoords(direction, &x, &y);
     if (IsFollowerWalkableTile(followerObj, x, y, direction))
-        return fast >= 2 ? GetWalkFasterMovementAction(direction)
+        return fast == 3 ? GetRideWaterCurrentMovementAction(direction)
+             : fast == 2 ? GetWalkFasterMovementAction(direction)
              : fast ? GetWalkFastMovementAction(direction) : GetWalkNormalMovementAction(direction);
 
     if (GetLedgeJumpDirection(x, y, direction) != DIR_NONE)
@@ -1297,14 +1298,20 @@ static void ApplyFollowerHalfTileOffset(struct ObjectEvent *followerObj)
 /*
  * Japanese port (user's request): when the player runs or rides the bicycle and the follower has dropped off
  * the player's trail (after a ledge jump, a turn it couldn't copy), it comes back at the player's speed
- * instead of a walk: 0 = walk, 1 = walk fast (the running speed, 8 frames a tile), 2 = walk faster
- * (4 frames a tile) to close a gap of 3 tiles or more, so it is soon right behind the player again.
+ * instead of a walk: 0 = walk, 1 = walk fast (8 frames a tile), 3 = the running / bicycle speed (6 frames a tile),
+ * 2 = walk faster (4 frames a tile) to close a gap of 3 tiles or more, so it is soon right behind the player again.
  */
 static u8 JpFollowerCatchUpSpeed(s16 dist)
 {
-    if (!(gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_DASH | PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE)))
+    struct ObjectEvent *p = &gObjectEvents[gPlayerAvatar.objectEventId];
+    bool8 fastPlayer = (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_DASH | PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+        || (p->movementActionId >= MOVEMENT_ACTION_PLAYER_RUN_DOWN && p->movementActionId <= MOVEMENT_ACTION_PLAYER_RUN_RIGHT)
+        /* the DASH flag is cleared while the player is in the air over a ledge: B held with the shoes still counts */
+        || ((gMain.heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH) && !(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING));
+
+    if (!fastPlayer)
         return dist >= 3 ? 1 : 0;   /* walking: a follower left 3 tiles behind (after a ledge) hurries back too */
-    return dist >= 3 ? 2 : 1;
+    return dist >= 3 ? 2 : 3;      /* running / bicycle: the player's speed (6 frames a tile), faster to catch up */
 }
 
 void UpdateFollowerPokemon(void)
@@ -1374,7 +1381,8 @@ void UpdateFollowerPokemon(void)
      * wraps around to 0. */
     if (dist > TELEPORT_DIST)
     {
-        if (TryFollowerStepTowardPlayer(followerObj, playerObj, TRUE))
+        /* Japanese port: catch up faster than a running / cycling player (walk faster), else walk fast */
+        if (TryFollowerStepTowardPlayer(followerObj, playerObj, JpFollowerCatchUpSpeed(dist)))
         {
             sFollower.stuckFrames = 0;
             return;
@@ -1466,7 +1474,7 @@ void UpdateFollowerPokemon(void)
  *   player's step         when                        frames  follower's step
  *   WALK_NORMAL           walking; bicycle uphill       16    WALK_NORMAL
  *   WALK_SLOW             walking on rock stairs        23    WALK_SLOW
- *   PLAYER_RUN            running (B held)               8    WALK_FAST
+ *   PLAYER_RUN            running (B held)               6    RIDE_WATER_CURRENT (JP port: faster running)
  *   PLAYER_RUN_SLOW       running on rock stairs        11    PLAYER_RUN_SLOW
  *   WALK_FAST             bicycle on rock stairs         8    WALK_FAST
  *   RIDE_WATER_CURRENT    bicycle                        6    RIDE_WATER_CURRENT
@@ -1483,7 +1491,7 @@ static const struct {
 } sSwapSteps[] = {
     { MOVEMENT_ACTION_WALK_NORMAL_DOWN,        GetWalkNormalMovementAction },
     { MOVEMENT_ACTION_WALK_SLOW_DOWN,          GetWalkSlowMovementAction },
-    { MOVEMENT_ACTION_PLAYER_RUN_DOWN,         GetWalkFastMovementAction },
+    { MOVEMENT_ACTION_PLAYER_RUN_DOWN,         GetRideWaterCurrentMovementAction }, /* Japanese port: running is 6 frames a tile */
     { MOVEMENT_ACTION_PLAYER_RUN_DOWN_SLOW,    GetPlayerRunSlowMovementAction },
     { MOVEMENT_ACTION_WALK_FAST_DOWN,          GetWalkFastMovementAction },
     { MOVEMENT_ACTION_RIDE_WATER_CURRENT_DOWN, GetRideWaterCurrentMovementAction },
