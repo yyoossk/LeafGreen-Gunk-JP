@@ -124,7 +124,8 @@ for _n in _TS:
     print('tilefix', _n, 'tiles', len(_ch), '(jp-kept', len(_jpdiff), ') cols', _pc, 'metatiles/attrs', _mc)
 
 # layouts: small FRLG+ fixes on maps that keep their size
-_SKIP_MAPS = {'SevenIsland_House_Room2', 'RS_BattleTower'}          # FRLG+ furniture for its own feature, not a fix
+_SKIP_MAPS = {'SevenIsland_House_Room2', 'RS_BattleTower',          # FRLG+ furniture for its own feature, not a fix
+              'SSAnne_Room1'}   # FRLG+'s desk/plant metatiles (0x3C8-) show garbage on the JP tiles (S.S. Anne 1F rooms)
 _alll = _j.load(open(_P + '/data/layouts/layouts.json'))['layouts']
 _lay = {l['blockdata_filepath'].split('/')[2]: l for l in _alll if 'blockdata_filepath' in l}
 _lidx = {l['blockdata_filepath'].split('/')[2]: i for i, l in enumerate(_alll) if 'blockdata_filepath' in l}
