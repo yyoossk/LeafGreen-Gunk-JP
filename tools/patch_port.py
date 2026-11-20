@@ -195,6 +195,9 @@ assert rd(0x08108F00,4)==struct.pack('<I',0x285); w8(0x08108F00,struct.pack('<I'
 assert rd(0x0810A69A,4)==bl_bytes(0x0810A69A,0x0810A358); bl(0x0810A69A,newsym['Island_OpenContextMenu'])
 for it in [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45, 63, 64, 65, 66, 67, 68, 69, 70, 71]: assert rom[0x39BD28+40*it+22]==1, it; rom[0x39BD28+40*it+22]=12
 for it in [179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 254, 255, 256, 257, 258]: assert rom[0x39BD28+40*it+22]==1, it; rom[0x39BD28+40*it+22]=13
+# ずかんの ぶんぷに 主人公の いる場所を だす（hk_dex_area_player.c、island 経由）
+assert rd(0x08107238,4)==bytes.fromhex('2df094fb'); bl(0x08107238,newsym['Island_DexAreaCreate'])
+assert rd(0x081072FC,4)==bytes.fromhex('2df014fc'); bl(0x081072FC,newsym['Island_DexAreaDestroy'])
 # ボックスの カーソル（て）が うごいたあと ふわふわ うごかなくなる（もとの ゲームから）：
 # DoCursorNewPosUpdate（いどうが おわったとき）の StartSpriteAnim(cursorSprite, CURSOR_ANIM_STILL=1) を BOUNCE=0 に
 for _a in (0x08092382, 0x080923B4):

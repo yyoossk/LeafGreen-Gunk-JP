@@ -184,3 +184,25 @@ Island_DexMonPageInput:   @ Task_DexScreen_ShowMonPage state 5: SELECT = stats /
 	bx r0
 3:	bx r4
 	.pool
+
+	.section .island,"ax"
+	.align 2
+	.global Island_DexAreaCreate
+	.thumb_func
+Island_DexAreaCreate:     @ ずかんの ぶんぷ: CreatePokedexAreaMarkers -> JpCreatePokedexAreaMarkers
+	push {r4, lr}
+	ldr r4, =JpCreatePokedexAreaMarkers
+	bl Island_CallR4
+	pop {r4}
+	pop {r1}
+	bx r1
+	.global Island_DexAreaDestroy
+	.thumb_func
+Island_DexAreaDestroy:    @ DestroyPokedexAreaMarkers -> JpDestroyPokedexAreaMarkers
+	push {r4, lr}
+	ldr r4, =JpDestroyPokedexAreaMarkers
+	bl Island_CallR4
+	pop {r4}
+	pop {r1}
+	bx r1
+	.pool
