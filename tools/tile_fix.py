@@ -126,6 +126,10 @@ for _n in _TS:
 # layouts: small FRLG+ fixes on maps that keep their size
 _SKIP_MAPS = {'SevenIsland_House_Room2', 'RS_BattleTower',          # FRLG+ furniture for its own feature, not a fix
               'SSAnne_Room1'}   # FRLG+'s desk/plant metatiles (0x3C8-) show garbage on the JP tiles (S.S. Anne 1F rooms)
+# FRLG+ also moves the Viridian / Celadon / Cinnabar gym buildings by one tile and moves the door warps with them;
+# only the blocks would come over here, leaving the door warp on a wall, so those gym blocks are kept as they are.
+_SKIP_MAPS |= {'CeladonCity', 'CinnabarIsland'}
+_SKIP_CELLS = {'ViridianCity': lambda x, y: x >= 30 and y <= 11}
 _alll = _j.load(open(_P + '/data/layouts/layouts.json'))['layouts']
 _lay = {l['blockdata_filepath'].split('/')[2]: l for l in _alll if 'blockdata_filepath' in l}
 _lidx = {l['blockdata_filepath'].split('/')[2]: i for i, l in enumerate(_alll) if 'blockdata_filepath' in l}
@@ -155,5 +159,7 @@ for _name, _L in sorted(_lay.items()):
         _lp = u32at(_LT + 4 * _lidx[_name])
         _at = u32at(_lp + (12 if _fn == 'map.bin' else 8)) - 0x08000000
         if bytes(rom[_at:_at + len(_a)]) != _a: print('tilefix skip (JP map differs)', _name, _fn); continue
+        if _name in _SKIP_CELLS and _fn == 'map.bin':
+            _cells = [k for k in _cells if not _SKIP_CELLS[_name](k % _L['width'], k // _L['width'])]
         for k in _cells: rom[_at + 2 * k: _at + 2 * k + 2] = _b[2 * k:2 * k + 2]
         print('tilefix map', _name, _fn, len(_cells))
