@@ -129,5 +129,5 @@ def _add_obj(g, m, layout, gfx, x, y, mt, script):
     return lid
 _add_obj(7, 2, 'LAYOUT_HOUSE1', 23, 9, 3, 0x09, _S('V151_EventScript_Bulbasaur'))
 _add_obj(3, 43, 'LAYOUT_ROUTE24', 25, 6, 8, 0x08, _S('V151_EventScript_Charmander'))
-_add_obj(3, 5, 'LAYOUT_VERMILION_CITY', 60, 17, 8, 0x08, _S('V151_EventScript_Squirtle'))
+_add_obj(3, 5, 'LAYOUT_VERMILION_CITY', 60, 20, 8, 0x08, _S('V151_EventScript_Squirtle'))
 print('v151 scripts OK')

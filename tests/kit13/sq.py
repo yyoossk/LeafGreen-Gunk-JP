@@ -5,7 +5,7 @@ g=Game('jp','/tmp/t13/s.ss',rom=sys.argv[1]); g.run(10)
 S=[]
 def sh():
     n=len(S); g.shot(f'/tmp/t13/sq{n}.png'); S.append(n)
-g.teleport('VERMILION_CITY',17,9); g.run(120); g.tap('U'); g.run(20)
+g.teleport('VERMILION_CITY',int(sys.argv[2]),int(sys.argv[3])); g.run(120); g.shot('/tmp/t13/pos.png'); g.tap('U'); g.run(20)
 def talk(): g.tap('A'); g.run(70)
 # 1 no badge
 talk(); sh(); g.tap('A'); g.run(60); sh(); g.tap('A'); g.run(60)
