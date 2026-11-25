@@ -209,6 +209,9 @@ assert rd(0x08063FD8,4)==bytes.fromhex('30b5041c') and rd(0x08063FE2,2)==b'\x01\
 for _a in (0x08362788, 0x0836279C, 0x083627B0, 0x083627C4):
     for _k in (0, 8):
         assert rd(_a+_k+2,1)[0] & 0x3F == 5; w8(_a+_k+2, bytes([(rd(_a+_k+2,1)[0] & 0xC0) | 3]))
+# つれあるきの ポケモンの はしる アニメ（hk_event_object_movement.c の gJpFollowerAnims）を sStepAnimTables に いれる：
+# つかわれていない sAnimTable_QuintyPlump(0x08362B60) の ばしょ。1歩ごとに あしを かえる（SetStepAnimHandleAlternation）
+assert rd(0x08362EE0,8)==struct.pack('<I',0x08362B60)+bytes([1,3,0,2]); w8(0x08362EE0,struct.pack('<I',newsym['gJpFollowerAnims']))
 # くすり・もちもの ポケットの どうぐを ひろう・もらうとき、ポケットの なまえを だす（もとは 1〜5 しか なく スクリプトが おわっていた）
 assert rd(0x08193B20,5)==bytes.fromhex('1900800d80')
 w8(0x08193B20,bytes([0x05])+struct.pack('<I',newsym['EventScript_JpBufferPocketName']))

@@ -627,6 +627,7 @@ static bool8 IsFollowerWalkableTile(struct ObjectEvent *mover, s16 x, s16 y, u8 
  * - Anything else, including a ledge seen from its side or from below, is a
  *   wall.
  */
+u8 JpGetFollowerRunMovementAction(u32 direction);
 static u8 GetFollowerStepAction(struct ObjectEvent *followerObj, u8 direction, bool8 fast)
 {
     s16 x = followerObj->currentCoords.x;
@@ -634,7 +635,7 @@ static u8 GetFollowerStepAction(struct ObjectEvent *followerObj, u8 direction, b
 
     MoveCoords(direction, &x, &y);
     if (IsFollowerWalkableTile(followerObj, x, y, direction))
-        return fast == 3 ? GetRideWaterCurrentMovementAction(direction)
+        return fast == 3 ? JpGetFollowerRunMovementAction(direction)
              : fast == 2 ? GetWalkFasterMovementAction(direction)
              : fast ? GetWalkFastMovementAction(direction) : GetWalkNormalMovementAction(direction);
 
@@ -1491,10 +1492,10 @@ static const struct {
 } sSwapSteps[] = {
     { MOVEMENT_ACTION_WALK_NORMAL_DOWN,        GetWalkNormalMovementAction },
     { MOVEMENT_ACTION_WALK_SLOW_DOWN,          GetWalkSlowMovementAction },
-    { MOVEMENT_ACTION_PLAYER_RUN_DOWN,         GetRideWaterCurrentMovementAction }, /* Japanese port: running is 6 frames a tile */
+    { MOVEMENT_ACTION_PLAYER_RUN_DOWN,         JpGetFollowerRunMovementAction }, /* Japanese port: running is 6 frames a tile (running anims, hk_event_object_movement.c) */
     { MOVEMENT_ACTION_PLAYER_RUN_DOWN_SLOW,    GetPlayerRunSlowMovementAction },
     { MOVEMENT_ACTION_WALK_FAST_DOWN,          GetWalkFastMovementAction },
-    { MOVEMENT_ACTION_RIDE_WATER_CURRENT_DOWN, GetRideWaterCurrentMovementAction },
+    { MOVEMENT_ACTION_RIDE_WATER_CURRENT_DOWN, JpGetFollowerRunMovementAction },
     { MOVEMENT_ACTION_WALK_FASTER_DOWN,        GetWalkFasterMovementAction },
 };
 

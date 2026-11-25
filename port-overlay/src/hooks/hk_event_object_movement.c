@@ -50,6 +50,35 @@ static EWRAM_DATA struct SpriteFrameImage sGunkFollowerFrames[9] = {0};
 static EWRAM_DATA struct ObjectEventGraphicsInfo sGunkFollowerGfxInfo = {0};
 static EWRAM_DATA const u16 *sGunkFollowerPalette = NULL;
 
+/* Japanese port: the follower's own animation table, sAnimTable_Standard (0-19) plus running anims 20-23
+   (ANIM_RUN_*): its walking frames, 3 frames each, so one 6-frame running tile is step 3 + stand 3, like the
+   player's run. patch_port.py puts this table in sStepAnimTables (in place of the unused QuintyPlump table), so
+   each step start skips from the stand frame to the next foot (SetStepAnimHandleAlternation) as for any NPC.
+   The walk-fast anims (4 frames each) on a 6-frame tile showed the step frame for 4 frames and the standing
+   frame for 2, so a running follower limped (がくがく). */
+static const union AnimCmd sAnim_JpFollowerRunSouth[] = {
+    ANIMCMD_FRAME(3, 3), ANIMCMD_FRAME(0, 3), ANIMCMD_FRAME(4, 3), ANIMCMD_FRAME(0, 3), ANIMCMD_JUMP(0),
+};
+static const union AnimCmd sAnim_JpFollowerRunNorth[] = {
+    ANIMCMD_FRAME(5, 3), ANIMCMD_FRAME(1, 3), ANIMCMD_FRAME(6, 3), ANIMCMD_FRAME(1, 3), ANIMCMD_JUMP(0),
+};
+static const union AnimCmd sAnim_JpFollowerRunWest[] = {
+    ANIMCMD_FRAME(7, 3), ANIMCMD_FRAME(2, 3), ANIMCMD_FRAME(8, 3), ANIMCMD_FRAME(2, 3), ANIMCMD_JUMP(0),
+};
+static const union AnimCmd sAnim_JpFollowerRunEast[] = {
+    ANIMCMD_FRAME(7, 3, .hFlip = TRUE), ANIMCMD_FRAME(2, 3, .hFlip = TRUE), ANIMCMD_FRAME(8, 3, .hFlip = TRUE), ANIMCMD_FRAME(2, 3, .hFlip = TRUE), ANIMCMD_JUMP(0),
+};
+EWRAM_DATA const union AnimCmd *gJpFollowerAnims[ANIM_STD_COUNT + 4] = {0};
+
+/* the follower's 6-frame step (running, cycling): PLAYER_RUN (StartRunningAnim, 6 frames a tile in this port)
+   with the running anims above; RIDE_WATER_CURRENT (same speed, walk-fast anims) if the table is not in use */
+u8 JpGetFollowerRunMovementAction(u32 direction)
+{
+    if (sGunkFollowerGfxInfo.anims == gJpFollowerAnims)
+        return GetPlayerRunMovementAction(direction);
+    return GetRideWaterCurrentMovementAction(direction);
+}
+
 bool8 SetGunkFollowerGraphics(u16 species, bool8 shiny)
 {
     static const u8 sFrameOfImage[9] = {0, 2, 4, 1, 1, 3, 3, 5, 5};
@@ -75,7 +104,13 @@ bool8 SetGunkFollowerGraphics(u16 species, bool8 shiny)
     sGunkFollowerGfxInfo.tracks = TRACKS_FOOT;
     sGunkFollowerGfxInfo.oam = &gObjectEventBaseOam_32x32;
     sGunkFollowerGfxInfo.subspriteTables = gObjectEventSpriteOamTables_32x32;
-    sGunkFollowerGfxInfo.anims = sAnimTable_Standard;
+    for (i = 0; i < ANIM_STD_COUNT; i++)
+        gJpFollowerAnims[i] = sAnimTable_Standard[i];
+    gJpFollowerAnims[ANIM_RUN_SOUTH] = sAnim_JpFollowerRunSouth;
+    gJpFollowerAnims[ANIM_RUN_NORTH] = sAnim_JpFollowerRunNorth;
+    gJpFollowerAnims[ANIM_RUN_WEST] = sAnim_JpFollowerRunWest;
+    gJpFollowerAnims[ANIM_RUN_EAST] = sAnim_JpFollowerRunEast;
+    sGunkFollowerGfxInfo.anims = gJpFollowerAnims;
     sGunkFollowerGfxInfo.images = sGunkFollowerFrames;
     sGunkFollowerGfxInfo.affineAnims = gDummySpriteAffineAnimTable;
     sGunkFollowerPalette = shiny ? sGunkFollowerGfx[species].shinyPal : sGunkFollowerGfx[species].pal;
