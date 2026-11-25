@@ -211,3 +211,25 @@ Island_DexAreaDestroy:    @ DestroyPokedexAreaMarkers -> JpDestroyPokedexAreaMar
 	pop {r1}
 	bx r1
 	.pool
+
+	.section .island,"ax"
+	.align 2
+	.global Island_StartHelpDraw
+	.thumb_func
+Island_StartHelpDraw:     @ スタートメニューの せつめい（8こ いじょうなら ださない）
+	push {r4, lr}
+	ldr r4, =JpStartHelpDraw
+	bl Island_CallR4
+	pop {r4}
+	pop {r1}
+	bx r1
+	.global Island_StartHelpPrint
+	.thumb_func
+Island_StartHelpPrint:
+	push {r4, lr}
+	ldr r4, =JpStartHelpPrint
+	bl Island_CallR4
+	pop {r4}
+	pop {r1}
+	bx r1
+	.pool

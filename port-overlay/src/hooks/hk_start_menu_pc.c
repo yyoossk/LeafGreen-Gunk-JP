@@ -14,6 +14,8 @@
 #define STARTMENU_JP_PC 9
 
 extern const u8 EventScript_JpMenuPC[];
+void JpAppendStartMenuHms(void);
+bool8 JpStartMenuFlashCallback(void);
 
 void JpSetUpStartMenu_NormalField(void)
 {
@@ -24,6 +26,7 @@ void JpSetUpStartMenu_NormalField(void)
     JpAppendToStartMenuItems(2);
     if (FlagGet(FLAG_SYS_POKEMON_GET) == TRUE)
         JpAppendToStartMenuItems(STARTMENU_JP_PC);
+    JpAppendStartMenuHms();   /* そらをとぶ・フラッシュ (hk_start_menu_hm.c) */
     JpAppendToStartMenuItems(3);
     JpAppendToStartMenuItems(4);
     JpAppendToStartMenuItems(5);
@@ -58,6 +61,6 @@ void JpStartMenu_FadeScreenIfLeavingOverworld(void)
 {
     void *cb = JpStartMenuCallbackPtr;
     if (cb != (void *)0x0806EC51 && cb != (void *)0x0806ECA9 && cb != (void *)0x0806ECBD
-     && cb != (void *)JpStartMenuPcCallback)
+     && cb != (void *)JpStartMenuPcCallback && cb != (void *)JpStartMenuFlashCallback)
         FadeScreen(FADE_TO_BLACK, 0);
 }

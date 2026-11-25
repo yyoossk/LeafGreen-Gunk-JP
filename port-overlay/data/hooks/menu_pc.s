@@ -44,3 +44,13 @@ gJpText_MenuPC::
 gJpStartMenuDesc_PC::
 	.string "ポケモンを　あずけたり　ひきだしたり\n"
 	.string "どこでも　パソコンを　つかえる$"
+gJpText_MenuFly::
+	.string "そらをとぶ$"
+gJpText_MenuFlash::
+	.string "フラッシュ$"
+gJpStartMenuDesc_Fly::
+	.string "いったことの　ある　まちへ\n"
+	.string "ひとっとびで　とんでいける$"
+gJpStartMenuDesc_Flash::
+	.string "くらい　ばしょを\n"
+	.string "あかるく　てらす$"
