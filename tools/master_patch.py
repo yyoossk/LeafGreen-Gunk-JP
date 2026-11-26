@@ -98,7 +98,9 @@ def master_apply():
     bymap = {}
     for p in MJ['place']: bymap.setdefault((p['g'], p['n']), []).append(p)
     extra = {(3, 0): [('obj', 18, 10, 7, 3, 8, newsym['JpMaster_EventScript_Guide'], 0x0EA)],
-             (10, 9): [('obj', 42, 6, 12, 3, 9, newsym['JpMaster_EventScript_TitleGiver'], 0)]}
+             (10, 9): [('obj', 42, 6, 12, 3, 9, newsym['JpMaster_EventScript_TitleGiver'], 0)],
+             # タマムシデパート 2かい：殿堂入りの あとの わざおしえ マスター（OLD_MAN_2、したむき）
+             (10, 1): [('obj', 33, 4, 4, 3, 8, newsym['EventScript_JpTutorAll'], 0x0EA)]}
     for key in set(bymap) | set(extra):
         g, n = key
         h = mapheader(g, n); ev = u32at(h + 4)

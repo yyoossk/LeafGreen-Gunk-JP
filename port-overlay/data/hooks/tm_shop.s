@@ -8,10 +8,10 @@
 	.section .rodata
 	.align 2
 
-@ 赤フルカラー: after the Hall of Fame the Celadon Dept. 2F TM clerk sells every TM except the 5 Game Corner prizes
+@ 赤フルカラー: after the Hall of Fame the Celadon Dept. 2F TM clerk sells every TM (TM01-TM50, ゲームコーナーの景品の分も)
 JpEventScript_CeladonTMClerk::
 	goto_if_unset FLAG_SYS_GAME_CLEAR, 0x081834F6
-	.byte 0x25, 0x87, 0x01, 0x21, 0x0D, 0x80, 0x02, 0x00, 0x06, 0x01, 0x46, 0x4C, 0x19, 0x08  @ goto_if_questlog EventScript_ReleaseEnd (copied)
+	.byte 0x25, 0x87, 0x01, 0x21, 0x0D, 0x80, 0x02, 0x00, 0x06, 0x01, 0x22, 0x4C, 0x19, 0x08  @ goto_if_questlog EventScript_ReleaseEnd (リーフグリーン 0x08194C22)
 	lock
 	faceplayer
 	message 0x0819372A
@@ -33,6 +33,7 @@ JpCeladon_AllTMs::
 	.2byte 298  @ TM10
 	.2byte 299  @ TM11
 	.2byte 300  @ TM12
+	.2byte 301  @ TM13
 	.2byte 302  @ TM14
 	.2byte 303  @ TM15
 	.2byte 304  @ TM16
@@ -42,15 +43,19 @@ JpCeladon_AllTMs::
 	.2byte 308  @ TM20
 	.2byte 309  @ TM21
 	.2byte 310  @ TM22
+	.2byte 311  @ TM23
+	.2byte 312  @ TM24
 	.2byte 313  @ TM25
 	.2byte 314  @ TM26
 	.2byte 315  @ TM27
 	.2byte 316  @ TM28
+	.2byte 317  @ TM29
 	.2byte 318  @ TM30
 	.2byte 319  @ TM31
 	.2byte 320  @ TM32
 	.2byte 321  @ TM33
 	.2byte 322  @ TM34
+	.2byte 323  @ TM35
 	.2byte 324  @ TM36
 	.2byte 325  @ TM37
 	.2byte 326  @ TM38
