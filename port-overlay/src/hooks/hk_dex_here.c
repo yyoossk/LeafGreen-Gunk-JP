@@ -143,6 +143,18 @@ static void DrawList(u8 win, const struct JpHereColors *c, u8 fill)
                 PrintMon(win, c, l->b, 88, y);
         }
     }
+    // 上・下に まだ ある ときは、右に ▲・▼ を かく（文字では なく 点で。どの まどでも おなじ）
+    {
+        u8 ax = GetWindowAttribute(win, WINDOW_WIDTH) * 8 - 12;
+        u8 k;
+        for (k = 0; k < 4; k++)
+        {
+            if (sJpHereScroll > 0)
+                FillWindowPixelRect(win, c->label[1], ax + 3 - k, 2 + ROW_H + 4 + k, 1 + 2 * k, 1);
+            if (sJpHereScroll + ROWS_SHOWN < sJpHereNumLines)
+                FillWindowPixelRect(win, c->label[1], ax + k, 2 + ROW_H * ROWS_SHOWN + 6 + k, 7 - 2 * k, 1);
+        }
+    }
     CopyWindowToVram(win, COPYWIN_FULL);
 }
 
