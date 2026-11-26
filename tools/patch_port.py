@@ -403,19 +403,34 @@ w8(0x080EFB84,struct.pack('<I',alloc(bytes(rom[0x003CD8B4:0x003CD8B4+40])+bytes(
 # --- メニューから パソコン (start menu item 9)
 tramp(0x0806E51C,newsym['JpSetUpStartMenu_NormalField'])
 assert rd(0x0806EB00,4)==bytes.fromhex('00b50848'); tramp(0x0806EB00,newsym['JpStartMenu_FadeScreenIfLeavingOverworld'])
-_na=alloc(rd(0x08366B14,72)+struct.pack('<IIIIII',newsym['gJpText_MenuPC'],newsym['JpStartMenuPcCallback']|1,newsym['gJpText_MenuFly'],newsym['JpStartMenuFlyCallback']|1,newsym['gJpText_MenuFlash'],newsym['JpStartMenuFlashCallback']|1))
+_na=alloc(rd(0x08366B14,72)+struct.pack('<IIIIII',newsym['gJpText_MenuPC'],newsym['JpStartMenuPcCallback']|1,newsym['gJpText_MenuHm'],newsym['JpStartMenuHmCallback']|1,newsym['gJpText_MenuHere'],newsym['JpStartMenuHereCallback']|1))
 for _r in (0x0806E708,0x0806EAE0,0x0806EB60):
     assert u32at(_r)==0x08366B14; w8(_r,struct.pack('<I',_na))
-_nd=alloc(rd(0x08366B64,36)+struct.pack('<III',newsym['gJpStartMenuDesc_PC'],newsym['gJpStartMenuDesc_Fly'],newsym['gJpStartMenuDesc_Flash']))
+_nd=alloc(rd(0x08366B64,36)+struct.pack('<III',newsym['gJpStartMenuDesc_PC'],newsym['gJpStartMenuDesc_Hm'],newsym['gJpStartMenuDesc_Here']))
 for _r in (0x0806E8A4,0x0806EAD4):
     assert u32at(_r)==0x08366B64; w8(_r,struct.pack('<I',_nd))
-# --- メニューに そらをとぶ・フラッシュ (hk_start_menu_hm.c)
+# --- ずかんの さいしょの メニューに「でるポケモン」(hk_dex_here.c)。ファイアレッドの 0x0840C704 など -> リーフグリーン
+_here=struct.pack('<II',newsym['gJpText_DexHere'],15)
+_ki=alloc(rd(0x0840C68C,8*17)+_here+rd(0x0840C68C+8*17,8*2))      # カントー：「ちいさい じゅん」の あと
+_ni=alloc(rd(0x0840C73C,8*18)+_here+rd(0x0840C73C+8*18,8*2))      # ぜんこく
+_kt=bytearray(rd(0x0840C724,0x18)); _kt[0:4]=struct.pack('<I',_ki); _kt[0xC]+=1; _kt=alloc(bytes(_kt))
+_nt=bytearray(rd(0x0840C7DC,0x18)); _nt[0:4]=struct.pack('<I',_ni); _nt[0xC]+=1; _nt=alloc(bytes(_nt))
+assert u32at(0x08103C18)==0x0840C724 and u32at(0x08103B18)==0x0840C7DC
+assert u32at(0x0840C724)==0x0840C68C and u32at(0x0840C7DC)==0x0840C73C
+w8(0x08103C18,struct.pack('<I',_kt)); w8(0x08103B18,struct.pack('<I',_nt))
+for _lit,_src in ((0x08103770,0x0840C7F4),(0x08103754,0x0840C804)):   # スクロールの やじるし：さいごの いちを 1つ ふやす
+    assert u32at(_lit)==_src
+    _ar=bytearray(rd(_src,16)); _ar[8]+=1; w8(_lit,struct.pack('<I',alloc(bytes(_ar))))
+assert u32at(0x08103CB4)==0x0840C814   # えらんでいる ものの アイコン：15ばんめ（くさむらの アイコン）を たす
+w8(0x08103CB4,struct.pack('<I',alloc(rd(0x0840C814,8*15)+rd(0x0840C814,8))))
+assert rd(0x0810377C,4)==bl_bytes(0x0810377C,0x08107B58); bl(0x0810377C,newsym['Island_DexTopMenuInput'])
+# --- メニューの ひでんわざ（そらをとぶ・フラッシュ）・でるポケモン (hk_start_menu_hm.c, hk_dex_here.c)
 # メニューが 8こ いじょうなら せつめいを ださない：DoDrawStartMenu / StartCB_HandleInput の 3つの bl
 assert rd(0x0806E880,4)==bl_bytes(0x0806E880,0x080F89F0); bl(0x0806E880,newsym['Island_StartHelpDraw'])
 for _a in (0x0806EA3A,0x0806EA88):
     assert rd(_a,4)==bl_bytes(_a,0x08113B40); bl(_a,newsym['Island_StartHelpPrint'])
-# スタートメニューの まどを 1マス ひろく（「そらをとぶ」「フラッシュ」が はみでない）：x 22 -> 21、はば 7 -> 8（CreateStartMenuWindow 0x080F895C）
-assert rd(0x080F896C,2)==bytes.fromhex('0720') and rd(0x080F8988,2)==bytes.fromhex('1622'); w8(0x080F896C,bytes.fromhex('0820')); w8(0x080F8988,bytes.fromhex('1522'))
+# スタートメニューの まどを 2マス ひろく（「でるポケモン」が はみでない）：x 22 -> 20、はば 7 -> 9（CreateStartMenuWindow 0x080F895C）
+assert rd(0x080F896C,2)==bytes.fromhex('0720') and rd(0x080F8988,2)==bytes.fromhex('1622'); w8(0x080F896C,bytes.fromhex('0920')); w8(0x080F8988,bytes.fromhex('1422'))  # 2マス ひろく（x 22->20、はば 7->9。タイルは 0x13D から 9x17=0x1D6 まで）
 # どうくつ・たてものの なかからも とぶ：てもちの メニューの SetUpFieldMove_Fly と、とぶ マップで A のときの UNDERGROUND/INDOOR の チェック
 assert rd(0x08125318,2)==bytes.fromhex('00b5'); tramp(0x08125318,newsym['JpSetUpFieldMove_Fly'])
 assert rd(0x080C634C,8)==bytes.fromhex('042801d0082809d1'); w8(0x080C634C,bytes.fromhex('0ce0c046c046c046'))

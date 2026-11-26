@@ -233,3 +233,16 @@ Island_StartHelpPrint:
 	pop {r1}
 	bx r1
 	.pool
+
+	.section .island,"ax"
+	.align 2
+	.global Island_DexTopMenuInput
+	.thumb_func
+Island_DexTopMenuInput:   @ ずかんの さいしょの メニュー：「いまいる ばしょ」
+	push {r4, lr}
+	ldr r4, =JpDexTopMenuInput
+	bl Island_CallR4
+	pop {r4}
+	pop {r1}
+	bx r1
+	.pool

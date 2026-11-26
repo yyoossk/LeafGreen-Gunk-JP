@@ -8,6 +8,7 @@
 #include "party_menu.h"
 #include "pokemon.h"
 #include "script.h"
+#include "menu.h"
 #include "constants/flags.h"
 #include "constants/map_types.h"
 #include "constants/moves.h"
@@ -19,8 +20,8 @@
 //  ポケモンは その わざを おぼえている ポケモン、いなければ さいしょの タマゴでない ポケモン（ひでんわざは おぼえなくても つかえる）。
 // メニューが 8こ いじょうに なると 下の せつめいの まどと かさなるので、そのときは せつめいを ださない（JpStartHelp*）。
 
-#define STARTMENU_JP_FLY   10
-#define STARTMENU_JP_FLASH 11
+#define STARTMENU_JP_HM    10   // 「ひでんわざ」：そらをとぶ・フラッシュを まとめた サブメニュー
+#define STARTMENU_JP_HERE  11   // 「このばしょ」：いまいる マップの やせいの ポケモン (hk_dex_here.c)
 
 #define JpAppendToStartMenuItems   ((void (*)(u8))0x0806E501)
 #define JpStartMenuExitCallback    ((bool8 (*)(void))0x0806ECA9)
@@ -108,10 +109,10 @@ bool8 JpStartMenuShowFlash(void)
 
 void JpAppendStartMenuHms(void)
 {
-    if (JpStartMenuShowFly())
-        JpAppendToStartMenuItems(STARTMENU_JP_FLY);
-    if (JpStartMenuShowFlash())
-        JpAppendToStartMenuItems(STARTMENU_JP_FLASH);
+    if (JpStartMenuShowFly() || JpStartMenuShowFlash())
+        JpAppendToStartMenuItems(STARTMENU_JP_HM);
+    if (FlagGet(FLAG_SYS_POKEDEX_GET))
+        JpAppendToStartMenuItems(STARTMENU_JP_HERE);
 }
 
 bool8 JpStartMenuFlyCallback(void)
@@ -147,4 +148,68 @@ void JpStartHelpPrint(const u8 *text, u8 mode)
 {
     if (sJpNumStartMenuItems <= 7)
         JpPrintTextOnHelpMessageWindow(text, mode);
+}
+
+// ---- 「ひでんわざ」の サブメニュー（スタートメニューの ひだり）
+u8 JpCreateWindowFromRect(u8 x, u8 y, u8 w, u8 h);
+void JpSetStdWindowBorderStyle(u8 windowId, bool8 copyToVram);
+u16 JpAddTextPrinterParameterized(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, void *callback);
+u8 JpMenu_InitCursor(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 numChoices, u8 initialCursorPos);
+void JpScheduleBgCopyTilemapToVram(u8 bg);
+#define JpMenu_ProcessInput ((s8 (*)(void))0x081104A9)
+#define JpClearStdWindowAndFrameToTransparent ((void (*)(u8, bool8))0x0810FF6D)
+#define JpShowStartMenu ((void (*)(void))0x0806E9C5)
+#define sJpStartMenuCallback (*(void **)0x02037024)
+extern const u8 gJpText_MenuFly[];
+extern const u8 gJpText_MenuFlash[];
+
+static EWRAM_DATA u8 sJpHmState = 0;
+static EWRAM_DATA u8 sJpHmWin = 0;
+static EWRAM_DATA u8 sJpHmItems[2] = {0};
+static EWRAM_DATA u8 sJpHmCount = 0;
+
+bool8 JpStartMenuHmCallback(void)
+{
+    s8 r;
+    u8 i;
+
+    if (sJpHmState == 0)
+    {
+        sJpHmCount = 0;
+        if (JpStartMenuShowFly())
+            sJpHmItems[sJpHmCount++] = 0;
+        if (JpStartMenuShowFlash())
+            sJpHmItems[sJpHmCount++] = 1;
+        sJpHmWin = JpCreateWindowFromRect(9, 0, 8, sJpHmCount * 2);
+        JpSetStdWindowBorderStyle(sJpHmWin, FALSE);
+        for (i = 0; i < sJpHmCount; i++)
+            JpAddTextPrinterParameterized(sJpHmWin, 2, sJpHmItems[i] == 0 ? gJpText_MenuFly : gJpText_MenuFlash, 8, 2 + 16 * i, 0xFF, NULL);
+        JpMenu_InitCursor(sJpHmWin, 2, 0, 2, 16, sJpHmCount, 0);
+        CopyWindowToVram(sJpHmWin, COPYWIN_FULL);
+        JpScheduleBgCopyTilemapToVram(0);
+        sJpHmState = 1;
+        return FALSE;
+    }
+    r = JpMenu_ProcessInput();
+    if (r == MENU_NOTHING_CHOSEN)
+        return FALSE;
+    JpClearStdWindowAndFrameToTransparent(sJpHmWin, TRUE);
+    ClearWindowTilemap(sJpHmWin);
+    RemoveWindow(sJpHmWin);
+    JpScheduleBgCopyTilemapToVram(0);
+    sJpHmState = 0;
+    if (r == MENU_B_PRESSED)
+    {
+        // スタートメニューに もどる（カーソルの じょうほうは サブメニューで うわがき されたので、メニューを ひらきなおす）
+        JpStartMenuExitCallback();
+        JpShowStartMenu();
+        return TRUE;
+    }
+    if (sJpHmItems[r] == 0)
+    {
+        FadeScreen(FADE_TO_BLACK, 0);
+        sJpStartMenuCallback = (void *)JpStartMenuFlyCallback;
+        return FALSE;
+    }
+    return JpStartMenuFlashCallback();
 }

@@ -11,5 +11,6 @@ for f in v151/*.c; do [ -e "$f" ] || continue; b=$(basename $f .c); ./cc.sh $f p
 for f in v151/*.s; do [ -e "$f" ] || continue; b=$(basename $f .s); /home/claude/tools/asm.sh $f pb151/$b.o; done
 python3 /home/claude/tools/gxbuild.py > /tmp/gx.log 2>&1 || { grep -v kept /tmp/gx.log; exit 1; }
 V151=1 python3 /home/claude/tools/build_port.py | grep -iE "error|missing|undefined" || true
-V151=1 python3 /home/claude/tools/patch_port.py /home/claude/roms/"Pocket Monsters - LeafGreen (Japan) (Rev 1).gba" /home/claude/work/port151.gba | grep -iE "error|Trace|assert|v151" || true
+V151=1 python3 /home/claude/tools/patch_port.py /home/claude/roms/"Pocket Monsters - LeafGreen (Japan) (Rev 1).gba" /home/claude/work/port151.gba > /tmp/pp151.log 2>&1 || { grep -iE "error|Trace|assert|line" /tmp/pp151.log | tail -5; echo BUILD151_FAILED; exit 1; }
+grep -iE "error|assert|v151" /tmp/pp151.log || true
 echo BUILD151_OK

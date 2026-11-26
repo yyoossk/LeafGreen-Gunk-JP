@@ -16,6 +16,8 @@
 extern const u8 EventScript_JpMenuPC[];
 void JpAppendStartMenuHms(void);
 bool8 JpStartMenuFlashCallback(void);
+bool8 JpStartMenuHmCallback(void);
+bool8 JpStartMenuHereCallback(void);
 
 void JpSetUpStartMenu_NormalField(void)
 {
@@ -61,6 +63,6 @@ void JpStartMenu_FadeScreenIfLeavingOverworld(void)
 {
     void *cb = JpStartMenuCallbackPtr;
     if (cb != (void *)0x0806EC51 && cb != (void *)0x0806ECA9 && cb != (void *)0x0806ECBD
-     && cb != (void *)JpStartMenuPcCallback && cb != (void *)JpStartMenuFlashCallback)
+     && cb != (void *)JpStartMenuPcCallback && cb != (void *)JpStartMenuHmCallback && cb != (void *)JpStartMenuHereCallback)
         FadeScreen(FADE_TO_BLACK, 0);
 }
