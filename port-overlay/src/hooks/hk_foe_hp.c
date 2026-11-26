@@ -82,6 +82,18 @@ static const struct SpriteTemplate sStripTemplate = {
 #define sLastHp     data[1]
 #define sLastMax    data[2]
 
+// row 16 の x 8-31 は じょうたい いじょうの アイコン（やけど など）の ばしょ。
+// アイコンが 出ている ときに その色を 下の行に うつすと 色の かたまりに なるので、ふつうの 中の色を つかう
+#define STATUS_X0 8
+#define STATUS_X1 32
+#define PLAIN_X   36
+static u8 PlainPix(u16 hbTile, u8 x)
+{
+    if (x >= STATUS_X0 && x < STATUS_X1)
+        x = PLAIN_X;
+    return GetPix(hbTile, x, ROW_PLAIN);
+}
+
 static void PatchHealthbox(u16 hbTile, u16 stripTile)
 {
     u8 x, y;
@@ -92,7 +104,7 @@ static void PatchHealthbox(u16 hbTile, u16 stripTile)
     // rows 24-31 become plain interior rows (the numbers row)
     for (y = ROW_NUMBERS; y < 32; y++)
         for (x = 0; x < 128; x++)
-            SetPix(hbTile, x, y, GetPix(hbTile, x, ROW_PLAIN));
+            SetPix(hbTile, x, y, PlainPix(hbTile, x));
 }
 
 static void DrawFoeHpNumbers(u16 hbTile, s16 hp, s16 maxHp)
@@ -112,6 +124,12 @@ static void DrawFoeHpNumbers(u16 hbTile, s16 hp, s16 maxHp)
         const u32 *src = (const u32 *)(OBJ_VRAM0 + (hbTile + (t >= 8 ? 32 : 0) + 16 + (t % 8)) * TILE_SIZE_4BPP);
         for (r = 0; r < 8; r++)
             ((u32 *)work)[t * 8 + r] = *src;
+    }
+    for (x = STATUS_X0; x < STATUS_X1; x++)
+    {
+        u8 c = PlainPix(hbTile, x);
+        for (y = 0; y < 8; y++)
+            BufSetPix(work, x, y, c);
     }
     p = ConvertIntToDecimalStringN(text, hp, STR_CONV_MODE_RIGHT_ALIGN, 3);
     *p++ = 0xBA;  // '/'
