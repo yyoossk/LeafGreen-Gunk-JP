@@ -438,6 +438,15 @@ assert rd(0x080C634C,8)==bytes.fromhex('042801d0082809d1'); w8(0x080C634C,bytes.
 assert u32at(0x080C6488)==0x0812533D; w8(0x080C6488,struct.pack('<I',newsym['JpCB2_FlyMapCancel']|1))
 assert rd(0x08193EAA,5)==bytes.fromhex('1604800000')
 w8(0x08193EAA,b'\x05'+struct.pack('<I',newsym['EventScript_JpTurnOffPC']))
+# --- ポケモンセンター：かいふくの あと しゅじんこうが したを むく（A れんだ たいさく）／せっていで かいふく アニメを とばす（nurse.s）
+# ファイアレッド Rev1 0x08193A58 / 0x08193AB7 / 0x08193AE4 -> リーフグリーン（おなじ バイト列で たしかめる）
+assert rd(0x08193A34,8)==bytes.fromhex('4f0f802947190851')   # EventScript_PkmnCenterNurse_TakeAndHealPkmn
+w8(0x08193A34,b'\x05'+struct.pack('<I',newsym['EventScript_JpNurseHeal']))
+for a in (0x08193A93, 0x08193AC0):   # ReturnPkmn / PlayerWaitingInUnionRoom の さいごの msgbox Text_WeHopeToSeeYouAgain
+    assert rd(a,9)==bytes.fromhex('0f00492e1908090403'), hex(a)
+    w8(a,b'\x05'+struct.pack('<I',newsym['EventScript_JpNurseBye']))
+# --- せってい：hk_option_menu.c（ファイアレッドの つくりなおし。「かいふく アニメ」を たす）
+tramp(0x08087ED0,newsym['JpCB2_OptionsMenuFromStartMenu'])
 # --- ランニングシューズは おかあさんから
 assert rd(0x0817F41A,11)==bytes.fromhex('166c400100292e002a9200')
 w8(0x0817F41A,b'\x04'+struct.pack('<I',newsym['EventScript_JpBrockScene'])+bytes(6))

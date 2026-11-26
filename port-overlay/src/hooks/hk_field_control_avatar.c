@@ -66,6 +66,15 @@ const u8 *GetInteractedLinkPlayerScript(struct MapPosition *position, u8 metatil
     return GetObjectEventScriptPointerByObjectEventId(objectEventId);
 }
 
+// ポケモンセンターで かいふくした あと しゅじんこうは したを むく。うしろに いる つれあるきの ポケモンに
+// A ボタンの れんだで はなしかけて しまわない ように、すこしの あいだ つれあるきとは はなさない
+__attribute__((section("ewram_late"))) static u32 sJpNoFollowerTalkUntil;
+
+void JpNurseNoFollowerTalk(void)
+{
+    sJpNoFollowerTalkUntil = gMain.vblankCounter2 + 120;
+}
+
 const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8 metatileBehavior, u8 direction)
 {
     u8 objectEventId;
@@ -74,6 +83,8 @@ const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8 metati
     objectEventId = GetObjectEventIdByPosition(position->x, position->y, position->elevation);
     if (objectEventId != OBJECT_EVENTS_COUNT && gObjectEvents[objectEventId].localId == LOCALID_FOLLOWER)
     {
+        if ((s32)(sJpNoFollowerTalkUntil - gMain.vblankCounter2) > 0)
+            return NULL;
         gSelectedObjectEvent = objectEventId;
         gSpecialVar_LastTalked = LOCALID_FOLLOWER;
         gSpecialVar_Facing = direction;
