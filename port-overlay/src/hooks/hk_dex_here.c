@@ -1,4 +1,5 @@
 #include "global.h"
+#include "event_data.h"
 #include "gflib.h"
 #include "list_menu.h"
 #include "script.h"
@@ -104,13 +105,16 @@ static const struct JpHereColors sDexColors = {{0, 1, 3}, {0, 12, 11}, {0, 14, 1
 // フィールドの まど（パレット 15）：2 こい はいいろ・3 うすい はいいろ、4 あか
 static const struct JpHereColors sFieldColors = {{1, 2, 3}, {1, 3, 1}, {1, 4, 5}};
 
+// せってい「みてない ポケモン」を「みせる」に すると、まだ みていない ポケモンも なまえを だす
+#define FLAG_JP_HERE_SHOW_UNSEEN 0x4AC
+
 static void PrintMon(u8 win, const struct JpHereColors *c, u16 species, u8 x, u8 y)
 {
     u16 dexNum = SpeciesToNationalPokedexNum(species);
 
     if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
         AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->normal, TEXT_SKIP_DRAW, JpSpeciesNames[species]);
-    else if (GetSetPokedexFlag(dexNum, FLAG_GET_SEEN))
+    else if (GetSetPokedexFlag(dexNum, FLAG_GET_SEEN) || FlagGet(FLAG_JP_HERE_SHOW_UNSEEN))
         AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->gray, TEXT_SKIP_DRAW, JpSpeciesNames[species]);
     else
         AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->gray, TEXT_SKIP_DRAW, gJpText_DexHereUnknown);

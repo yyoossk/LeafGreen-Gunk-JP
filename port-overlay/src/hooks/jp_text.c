@@ -11,3 +11,6 @@ const u8 gText_ExpAllOn[] = _("ぜんいんがくしゅうを オンにした！
 const u8 gText_ExpAllOff[] = _("ぜんいんがくしゅうを オフにした！{PAUSE_UNTIL_PRESS}");
 const u8 gJpText_RButton[] = _("{R_BUTTON}");
 const u8 gJpText_OptionFastHeal[] = _("かいふく　アニメ");
+const u8 gJpText_OptionUnseen[] = _("みてない　ポケモン");
+const u8 gJpText_UnseenHide[] = _("かくす");
+const u8 gJpText_UnseenShow[] = _("みせる");

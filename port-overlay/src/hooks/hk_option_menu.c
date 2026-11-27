@@ -28,6 +28,7 @@ enum
     MENUITEM_BUTTONMODE,
     MENUITEM_FRAMETYPE,
     MENUITEM_FASTHEAL,
+    MENUITEM_UNSEEN,
     MENUITEM_COUNT
 };
 
@@ -42,8 +43,8 @@ struct JpOptionMenu
 
 #define sOptionMenuPtr (*(struct JpOptionMenu **)0x0203956C)   // JP sOptionMenuPtr (EWRAM)
 
-#define ROW_PITCH 13
-#define ROW_Y(i) ((i) * ROW_PITCH + 1)
+#define ROW_PITCH 12
+#define ROW_Y(i) ((i) * ROW_PITCH)
 
 // JP data
 #define JpBgTemplates       ((const struct BgTemplate *)0x0838E784)
@@ -54,21 +55,26 @@ struct JpOptionMenu
 
 extern const u8 gJpText_TextSpeedInstant[];
 extern const u8 gJpText_OptionFastHeal[];
+extern const u8 gJpText_OptionUnseen[];
+extern const u8 gJpText_UnseenHide[];
+extern const u8 gJpText_UnseenShow[];
 bool8 FlagGet(u16 id);
 u8 FlagSet(u16 id);
 u8 FlagClear(u16 id);
+#define FLAG_JP_HERE_SHOW_UNSEEN 0x4AC   // ここででるポケモン：まだ みていない ポケモンも なまえを だす
 #define FLAG_JP_FAST_HEAL 0x4AB   // ポケモンセンターの かいふく アニメを みない
 
-static const u16 sItemCounts[MENUITEM_COUNT] = {4, 2, 2, 2, 3, 10, 2};
+static const u16 sItemCounts[MENUITEM_COUNT] = {4, 2, 2, 2, 3, 10, 2, 2};
 
 static const u8 *const sItemNames[MENUITEM_COUNT] =
 {
     (const u8 *)0x083DBB1A, (const u8 *)0x083DBB23, (const u8 *)0x083DBB2C, (const u8 *)0x083DBB35,
-    (const u8 *)0x083DBB3A, (const u8 *)0x083DBB41, gJpText_OptionFastHeal,
+    (const u8 *)0x083DBB3A, (const u8 *)0x083DBB41, gJpText_OptionFastHeal, gJpText_OptionUnseen,
 };
 static const u8 *const sTextSpeedNames[] = {(const u8 *)0x083DBB4B, (const u8 *)0x083DBB4F, (const u8 *)0x083DBB53, gJpText_TextSpeedInstant};
 static const u8 *const sSeeNames[] = {(const u8 *)0x083DBB57, (const u8 *)0x083DBB5B};   // みる／みない
 static const u8 *const sStyleNames[] = {(const u8 *)0x083DBB5F, (const u8 *)0x083DBB64};
+static const u8 *const sUnseenNames[] = {gJpText_UnseenHide, gJpText_UnseenShow};
 static const u8 *const sSoundNames[] = {(const u8 *)0x083DBB69, (const u8 *)0x083DBB6E};
 static const u8 *const sButtonNames[] = {(const u8 *)0x083DBB77, (const u8 *)0x083DBB7F, (const u8 *)0x083DBB7B};
 
@@ -117,6 +123,7 @@ void JpCB2_OptionsMenuFromStartMenu(void)
     sOptionMenuPtr->option[MENUITEM_BUTTONMODE] = gSaveBlock2Ptr->optionsButtonMode;
     sOptionMenuPtr->option[MENUITEM_FRAMETYPE] = gSaveBlock2Ptr->optionsWindowFrameType;
     sOptionMenuPtr->option[MENUITEM_FASTHEAL] = FlagGet(FLAG_JP_FAST_HEAL) ? 1 : 0;
+    sOptionMenuPtr->option[MENUITEM_UNSEEN] = FlagGet(FLAG_JP_HERE_SHOW_UNSEEN) ? 1 : 0;
     for (i = 0; i < MENUITEM_COUNT; i++)
     {
         if (sOptionMenuPtr->option[i] > sItemCounts[i] - 1)
@@ -239,6 +246,7 @@ static void BufferOptionMenuString(u8 selection)
     case MENUITEM_SOUND:       s = sSoundNames[v]; break;
     case MENUITEM_BUTTONMODE:  s = sButtonNames[v]; break;
     case MENUITEM_FASTHEAL:    s = sSeeNames[v]; break;
+    case MENUITEM_UNSEEN:      s = sUnseenNames[v]; break;
     case MENUITEM_FRAMETYPE:
         StringCopy(str, JpText_FrameType);
         ConvertIntToDecimalStringN(buf, v + 1, 1, 2);
@@ -357,6 +365,10 @@ static void CloseAndSaveOptionMenu(u8 taskId)
         FlagSet(FLAG_JP_FAST_HEAL);
     else
         FlagClear(FLAG_JP_FAST_HEAL);
+    if (sOptionMenuPtr->option[MENUITEM_UNSEEN] == 1)
+        FlagSet(FLAG_JP_HERE_SHOW_UNSEEN);
+    else
+        FlagClear(FLAG_JP_HERE_SHOW_UNSEEN);
     SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
     Free(sOptionMenuPtr);
     sOptionMenuPtr = NULL;
