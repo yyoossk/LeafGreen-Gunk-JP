@@ -5,6 +5,7 @@
 #include "script.h"
 #include "data.h"
 #include "menu.h"
+#include "menu_indicators.h"
 #include "fieldmap.h"
 #include "pokedex.h"
 #include "pokemon.h"
@@ -18,7 +19,7 @@
 
 // ずかんの さいしょの メニューに「いまいる ばしょ」：いまの マップで でる やせいの ポケモンを、
 // くさむら・なみのり・いわくだき・つり ごとに ならべる。つかまえた ポケモンは くろ、みただけは はいいろ、
-// みていない ポケモンは「？？？？？」。うえ・したで スクロール、A か B で もどる。
+// つかまえた ポケモンは ボールの アイコン つき、みつけた ポケモンは ふつうの いろ、みていない ポケモンは はいいろの「？？？？？」。うえ・したで スクロール、A か B で もどる。
 // JP Task_PokedexScreen の ListMenu_ProcessInput (0x0810377C) を JpDexTopMenuInput に つなぎかえる。
 
 #define DEX_MODE_JP_HERE 15
@@ -41,6 +42,32 @@ struct JpHereLine { u16 a, b; };
 static EWRAM_DATA bool8 sJpHereActive = FALSE;
 static EWRAM_DATA u8 sJpHereScroll = 0;
 static EWRAM_DATA u8 sJpHereNumLines = 0;
+static EWRAM_DATA u8 sJpHereArrows = 0xFF;
+static EWRAM_DATA u16 sJpHereScroll16 = 0;
+
+#define JP_HERE_ARROW_TAG 0x6C10
+
+// まどに はいりきらない ときは うえ・したの やじるしを だす（スクロール できる ことが わかるように）
+static void JpHereArrowsUpdate(void)
+{
+    sJpHereScroll16 = sJpHereScroll;
+}
+
+static void JpHereArrowsAdd(s32 x, s32 top, s32 bottom)
+{
+    sJpHereScroll16 = sJpHereScroll;
+    sJpHereArrows = 0xFF;
+    if (sJpHereNumLines > ROWS_SHOWN)
+        sJpHereArrows = AddScrollIndicatorArrowPairParameterized(SCROLL_ARROW_UP, x, top, bottom,
+                            sJpHereNumLines - ROWS_SHOWN, JP_HERE_ARROW_TAG, JP_HERE_ARROW_TAG, &sJpHereScroll16);
+}
+
+static void JpHereArrowsRemove(void)
+{
+    if (sJpHereArrows != 0xFF)
+        RemoveScrollIndicatorArrowPair(sJpHereArrows);
+    sJpHereArrows = 0xFF;
+}
 
 static const u8 *const sSectionNames[] = {gJpText_DexHereLand, gJpText_DexHereWater, gJpText_DexHereRock, gJpText_DexHereFish};
 
@@ -99,22 +126,66 @@ static void BuildLines(struct JpHereLine *sJpHereLines)
     }
 }
 
-struct JpHereColors { u8 normal[3]; u8 gray[3]; u8 label[3]; };
+struct JpHereColors { u8 normal[3]; u8 gray[3]; u8 label[3]; u8 ballWhite; };
 // ずかんの パレット：1 くろ・3 かげ、12 はいいろ・11 うすい かげ、14 あか（「さくいん」と おなじ）
-static const struct JpHereColors sDexColors = {{0, 1, 3}, {0, 12, 11}, {0, 14, 15}};
+static const struct JpHereColors sDexColors = {{0, 1, 3}, {0, 12, 11}, {0, 14, 15}, 0};
 // フィールドの まど（パレット 15）：2 こい はいいろ・3 うすい はいいろ、4 あか
-static const struct JpHereColors sFieldColors = {{1, 2, 3}, {1, 3, 1}, {1, 4, 5}};
+static const struct JpHereColors sFieldColors = {{1, 2, 3}, {1, 3, 1}, {1, 4, 5}, 1};
 
-// せってい「みてない ポケモン」を「みせる」に すると、まだ みていない ポケモンも なまえを だす
+// せってい「みかけてない ポケモン」を「みせる」に すると、まだ みていない ポケモンも なまえを だす
 #define FLAG_JP_HERE_SHOW_UNSEEN 0x4AC
 
+// つかまえた ポケモンの まえに だす モンスターボールの アイコン（8×8）。
+// O＝ふち、R＝あか、W＝しろ、.＝すきま
+static const char sBallPattern[8][9] = {
+    "..OOOO..",
+    ".ORRRRO.",
+    "ORRRRRRO",
+    "OOOWWOOO",
+    "OWOWWOWO",
+    "OWWOOWWO",
+    ".OWWWWO.",
+    "..OOOO..",
+};
+
+static void DrawBall(u8 win, u8 outline, u8 red, u8 white, u8 fill, u16 x, u16 y)
+{
+    u8 gfx[32];
+    u8 r, cx;
+
+    for (r = 0; r < 8; r++)
+        for (cx = 0; cx < 8; cx += 2)
+        {
+            u8 px[2], k;
+            for (k = 0; k < 2; k++)
+            {
+                switch (sBallPattern[r][cx + k])
+                {
+                case 'O': px[k] = outline; break;
+                case 'R': px[k] = red; break;
+                case 'W': px[k] = white; break;
+                default:  px[k] = fill; break;
+                }
+            }
+            gfx[r * 4 + cx / 2] = px[0] | (px[1] << 4);
+        }
+    BlitBitmapRectToWindow(win, gfx, 0, 0, 8, 8, x, y, 8, 8);
+}
+
+// つかまえた ＝ ボールの アイコン ＋ ふつうの いろ、みつけた ＝ ふつうの いろ、
+// まだ みていない ＝ はいいろの「？？？？？」（せってい「みてない ポケモン」が みせる なら はいいろの なまえ）
 static void PrintMon(u8 win, const struct JpHereColors *c, u16 species, u8 x, u8 y)
 {
     u16 dexNum = SpeciesToNationalPokedexNum(species);
 
     if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
+    {
+        DrawBall(win, c->normal[1], c->label[1], c->ballWhite, c->normal[0], x - 10, y + 3);
         AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->normal, TEXT_SKIP_DRAW, JpSpeciesNames[species]);
-    else if (GetSetPokedexFlag(dexNum, FLAG_GET_SEEN) || FlagGet(FLAG_JP_HERE_SHOW_UNSEEN))
+    }
+    else if (GetSetPokedexFlag(dexNum, FLAG_GET_SEEN))
+        AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->normal, TEXT_SKIP_DRAW, JpSpeciesNames[species]);
+    else if (FlagGet(FLAG_JP_HERE_SHOW_UNSEEN))
         AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->gray, TEXT_SKIP_DRAW, JpSpeciesNames[species]);
     else
         AddTextPrinterParameterized4(win, FONT_NORMAL, x, y, 0, 0, c->gray, TEXT_SKIP_DRAW, gJpText_DexHereUnknown);
@@ -147,18 +218,6 @@ static void DrawList(u8 win, const struct JpHereColors *c, u8 fill)
                 PrintMon(win, c, l->b, 88, y);
         }
     }
-    // 上・下に まだ ある ときは、右に ▲・▼ を かく（文字では なく 点で。どの まどでも おなじ）
-    {
-        u8 ax = GetWindowAttribute(win, WINDOW_WIDTH) * 8 - 12;
-        u8 k;
-        for (k = 0; k < 4; k++)
-        {
-            if (sJpHereScroll > 0)
-                FillWindowPixelRect(win, c->label[1], ax + 3 - k, 2 + ROW_H + 4 + k, 1 + 2 * k, 1);
-            if (sJpHereScroll + ROWS_SHOWN < sJpHereNumLines)
-                FillWindowPixelRect(win, c->label[1], ax + k, 2 + ROW_H * ROWS_SHOWN + 6 + k, 7 - 2 * k, 1);
-        }
-    }
     CopyWindowToVram(win, COPYWIN_FULL);
 }
 
@@ -183,18 +242,21 @@ s32 JpDexTopMenuInput(u8 listTaskId)
         {
             PlaySE(SE_SELECT);
             sJpHereActive = FALSE;
+            JpHereArrowsRemove();
             RedrawListMenu(listTaskId);
         }
         else if (JOY_REPT(DPAD_DOWN) && sJpHereScroll + ROWS_SHOWN < sJpHereNumLines)
         {
             PlaySE(SE_SELECT);
             sJpHereScroll++;
+            JpHereArrowsUpdate();
             Draw(ListWindow(listTaskId));
         }
         else if (JOY_REPT(DPAD_UP) && sJpHereScroll > 0)
         {
             PlaySE(SE_SELECT);
             sJpHereScroll--;
+            JpHereArrowsUpdate();
             Draw(ListWindow(listTaskId));
         }
         gMain.newKeys = 0;
@@ -209,6 +271,7 @@ s32 JpDexTopMenuInput(u8 listTaskId)
         sJpHereScroll = 0;
         sJpHereActive = TRUE;
         Draw(ListWindow(listTaskId));
+        JpHereArrowsAdd(156, 40, 138);
         gMain.newKeys = 0;
         return LIST_NOTHING_CHOSEN;
     }
@@ -234,6 +297,7 @@ static void Task_JpHereField(u8 taskId)
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
         PlaySE(SE_SELECT);
+        JpHereArrowsRemove();
         JpClearStdWindowAndFrameToTransparent(win, TRUE);
         ClearWindowTilemap(win);
         RemoveWindow(win);
@@ -245,12 +309,14 @@ static void Task_JpHereField(u8 taskId)
     {
         PlaySE(SE_SELECT);
         sJpHereScroll++;
+        JpHereArrowsUpdate();
         DrawList(win, &sFieldColors, 1);
     }
     else if (JOY_REPT(DPAD_UP) && sJpHereScroll > 0)
     {
         PlaySE(SE_SELECT);
         sJpHereScroll--;
+        JpHereArrowsUpdate();
         DrawList(win, &sFieldColors, 1);
     }
 }
@@ -267,6 +333,7 @@ bool8 JpStartMenuHereCallback(void)
     JpSetStdWindowBorderStyle(win, FALSE);
     sJpHereScroll = 0;
     DrawList(win, &sFieldColors, 1);
+    JpHereArrowsAdd(200, 32, 128);
     JpScheduleBgCopyTilemapToVram(0);
     gTasks[CreateTask(Task_JpHereField, 80)].data[0] = win;
     return TRUE;
